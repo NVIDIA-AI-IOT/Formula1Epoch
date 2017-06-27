@@ -1,25 +1,23 @@
 from PIL import Image
-from numpy import*
-from os import listdir
+from numpy import asarray
+import glob
 
 # All standalone helper functions can be defined here
-def loadImagesAsPixels(path):
-    # return array of images
-    imagesList = listdir(path)
-    loadedImages = []
-    pixelList = []
-    for image in imagesList:
-        img = Image.open(path + image)
-        pixelList.append(imageToPixels(image))
-        loadedImages.append(img)
 
-    print(loadedImages)
-    print(pixelList)
+def getTrainingData(path):
+    # return training sata
+
+    pixelList = []
+
+    for filename in glob.glob(path+"*.jpg"):
+        im = Image.open(filename)
+        pixelList.append(imageToPixels(im))
+
     trainX, finalX = splitList(pixelList)
     return trainX, finalX
 
 def imageToPixels(image):
-    temp=asarray(Image.open(image))
+    temp=asarray(image)
     x=temp.shape[0]
     y=temp.shape[1]*temp.shape[2]
 
@@ -29,15 +27,27 @@ def imageToPixels(image):
 def parseTextFile(path):
     # works for csv or txt files
     f = open(path, 'r')
+
     readings = []
+    data = []
 
     for t in f:
-        readings.append(t)
-    trainY, finalY = splitList(readings)
+        readings.append(t.strip('\n'))
+
+    for r in readings:
+        arr = r.split(',')
+        data.append(arr)
+
+    trainY, finalY = splitList(data)
     return trainY, finalY
 
-def splitList(array):
+def splitList(bigAr):
+    # 4/5 of data is training data, the rest is testing data
+    array = bigAr[0]
     split = len(array)*4/5
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
+
+g = parseTextFile('/home/ricky/readings.txt')
+print(g[0])
