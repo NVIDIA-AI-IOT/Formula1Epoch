@@ -33,5 +33,3 @@ def parseTextFile(path):
     for t in f:
         readings.append(t)
     return readings
-
-print(parseTextFile("/home/ricky/readings.txt"))
