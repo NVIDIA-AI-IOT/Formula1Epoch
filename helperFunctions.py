@@ -35,6 +35,7 @@ def parseTextFile(path):
         readings.append(t.strip('\n'))
 
     for r in readings:
+
         arr = r.split(',')
         data.append(arr)
 
@@ -43,11 +44,16 @@ def parseTextFile(path):
 
 def splitList(bigAr):
     # 4/5 of data is training data, the rest is testing data
-    array = bigAr[0]
+    arrayG = bigAr[0]
+    array = []
+
+    for l in arrayG:
+        array.append(float(l))
+
     split = len(array)*4/5
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
 
 g = parseTextFile('/home/ricky/readings.txt')
-print(g[0])
+print(g)
