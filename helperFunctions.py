@@ -6,14 +6,13 @@ import glob
 
 def getTrainingData(path):
     # return training sata
-
     pixelList = []
 
     for filename in glob.glob(path+"*.jpg"):
         im = Image.open(filename)
         pixelList.append(imageToPixels(im))
 
-    trainX, finalX = splitList(pixelList)
+    trainX, finalX = splitImage(pixelList)
     return trainX, finalX
 
 def imageToPixels(image):
@@ -42,6 +41,14 @@ def parseTextFile(path):
     trainY, finalY = splitList(data)
     return trainY, finalY
 
+def splitImage(bigAr):
+    # 4/5 of data is training data, the rest is testing data
+    array = bigAr[0]
+    split = len(array)*4/5
+    normalArray = array[:split]
+    testArray = array[split:]
+    return normalArray, testArray
+
 def splitList(bigAr):
     # 4/5 of data is training data, the rest is testing data
     arrayG = bigAr[0]
@@ -54,6 +61,3 @@ def splitList(bigAr):
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
-
-g, y = parseTextFile('/home/ricky/readings.txt')
-print(g)
