@@ -48,12 +48,12 @@ def splitList(bigAr):
     array = []
 
     for l in arrayG:
-        array.append(float(l))
+        array.append([float(l)])
 
     split = len(array)*4/5
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
 
-g = parseTextFile('/home/ricky/readings.txt')
+g, y = parseTextFile('/home/ricky/readings.txt')
 print(g)
