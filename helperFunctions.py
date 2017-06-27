@@ -15,7 +15,8 @@ def loadImagesAsPixels(path):
 
     print(loadedImages)
     print(pixelList)
-    return pixelList
+    trainX, finalX = splitList(pixelList)
+    return trainX, finalX
 
 def imageToPixels(image):
     temp=asarray(Image.open(image))
@@ -32,4 +33,11 @@ def parseTextFile(path):
 
     for t in f:
         readings.append(t)
-    return readings
+    trainY, finalY = splitList(readings)
+    return trainY, finalY
+
+def splitList(array):
+    split = len(array)*4/5
+    normalArray = array[:split]
+    testArray = array[split:]
+    return normalArray, testArray

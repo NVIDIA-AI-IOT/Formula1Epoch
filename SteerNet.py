@@ -5,6 +5,8 @@ import numpy as np
 from keras.models import Model, load_model, Sequential
 from keras.optimizers import Adam
 from keras.layers import Input, Convolution2D, MaxPooling2D, Activation, Dropout, Flatten, Dense
+import cv2
+import helperFunctions
 
 def model():
     # model with 3 hidden layers
@@ -43,10 +45,20 @@ def trainModel(model, imgIn, jstkOut):
     modelName = modelName + ".h5"
     model.save(modelName)
     print("Saved as %s" %(modelName) )
+    return model
 
-def testModel(testX, testY):
+def testModel(model, testX, testY):
     # Test model and evauluate accuracy
     scores = model.evaluate(testX, testY)
     print("\nAccuracy: " + model.metrics_name[1], scores[1]*100)
 
-model()
+def main():
+    imagePath = raw_input("Please enter the filepath to your images folder")
+    labelPath = raw_input("Please enter the filepath to your labels folder")
+    imgAr, testX = helperFunctions.loadImagesAsPixels(imagePath)
+    jstkAr, testY = helperFunctions.parseTextFile(labelPath)
+    steerModel = model()
+    trModel = trainModel(steerModel, imgAr, jstkAr)
+    testModel(model, testX, testY)
+
+main()
