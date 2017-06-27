@@ -1,8 +1,8 @@
 from PIL import Image
 from numpy import*
 
-def imageToPixels():
-    temp=asarray(Image.open('test.jpg'))
+def imageToPixels(image):
+    temp=asarray(Image.open(image))
     x=temp.shape[0]
     y=temp.shape[1]*temp.shape[2]
 
