@@ -1,5 +1,5 @@
 from PIL import Image
-from numpy import asarray
+import numpy as np
 import glob
 
 # All standalone helper functions can be defined here
@@ -7,13 +7,9 @@ import glob
 def getTrainingData(path):
     # return training sata
     pixelList = []
-    print("Hello world")
-    print("Your path is: " + path)
 
     for filename in glob.glob(path+"*.jpg"):
-        print(filename)
         im = Image.open(filename)
-
         pixelList.append(imageToPixels(im))
 
     trainX, finalX = splitImage(pixelList)
@@ -21,12 +17,12 @@ def getTrainingData(path):
 
 def imageToPixels(image):
     resize = image.resize((672, 376), Image.NEAREST)
-    temp=asarray(resize)
-
-    return temp
+    #temp = np.array(resize)
+    image_convert = np.swapaxes(np.swapaxes(resize, 1, 2), 0, 1)
+    return image_convert
 
 def parseTextFile(path):
-    # works for csv or txt files
+    # works forheight csv or txt files
     f = open(path, 'r')
 
     readings = []
@@ -43,10 +39,8 @@ def parseTextFile(path):
     trainY, finalY = splitList(data)
     return trainY, finalY
 
-def splitImage(bigAr):
+def splitImage(array):
     # 4/5 of data is training data, the rest is testing data
-    print(bigAr)
-    array = bigAr
     split = len(array)*4/5
     normalArray = array[:split]
     testArray = array[split:]
@@ -64,3 +58,6 @@ def splitList(bigAr):
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
+
+trainX, trainY = getTrainingData("/home/ricky/testDir/")
+print(trainX)
