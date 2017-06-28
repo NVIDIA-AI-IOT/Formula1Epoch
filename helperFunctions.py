@@ -10,7 +10,9 @@ def getTrainingData(path):
 
     for filename in glob.glob(path+"*.jpg"):
         im = Image.open(filename)
+        #print(im)
         pixelList.append(imageToPixels(im))
+        print(len(pixelList))
 
     trainX, finalX = splitImage(pixelList)
     return trainX, finalX
@@ -19,7 +21,9 @@ def imageToPixels(image):
     resize = image.resize((672, 376), Image.NEAREST)
     #temp = np.array(resize)
     image_convert = np.swapaxes(np.swapaxes(resize, 1, 2), 0, 1)
-    return image_convert
+    img = np.array(image_convert)
+    #print(img)
+    return img
 
 def parseTextFile(path):
     # works forheight csv or txt files
@@ -58,3 +62,18 @@ def splitList(bigAr):
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
+
+image = imageToPixels(Image.open("/home/ricky/test.jpg"))
+x, y = getTrainingData("/home/ricky/testDir/")
+print(x)
+print(len(x))
+print("\n\n")
+print(x[0])
+print(len(x[0]))
+print("\n\n")
+print(x[0][0])
+print(len(x[0][0]))
+print("\n\n")
+print(x[0][0][0])
+print("\n\n")
+print(x[0][0][0][0])
