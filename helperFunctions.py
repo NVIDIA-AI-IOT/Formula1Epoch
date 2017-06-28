@@ -20,11 +20,9 @@ def getTrainingData(path):
     return trainX, finalX
 
 def imageToPixels(image):
-    temp=asarray(image)
-    x=temp.shape[0]
-    y=temp.shape[1]*temp.shape[2]
+    resize = image.resize((672, 376), Image.NEAREST)
+    temp=asarray(resize)
 
-    temp.resize((x,y)) # a 2D array
     return temp
 
 def parseTextFile(path):
