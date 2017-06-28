@@ -1,10 +1,22 @@
 from PIL import Image
 import numpy as np
 import glob
+import os
 
 # All standalone helper functions can be defined here
 
-def getTrainingData(path):
+def getTrainingData(p):
+    if p.startswith("/"):
+        if p.endswith("/"):
+            path = p
+        else :
+            path = p + "/"
+    else:
+        if p.endswith("/"):
+            path = os.getcwd() + "/" + p
+        else:
+            path = os.getcwd() + "/" + p + "/"
+
     # return training sata
     pixelList = []
 
@@ -12,7 +24,6 @@ def getTrainingData(path):
         im = Image.open(filename)
         #print(im)
         pixelList.append(imageToPixels(im))
-        print(len(pixelList))
 
     trainX, finalX = splitImage(pixelList)
     return trainX, finalX
@@ -63,17 +74,4 @@ def splitList(bigAr):
     testArray = array[split:]
     return normalArray, testArray
 
-image = imageToPixels(Image.open("/home/ricky/test.jpg"))
-x, y = getTrainingData("/home/ricky/testDir/")
-print(x)
-print(len(x))
-print("\n\n")
-print(x[0])
-print(len(x[0]))
-print("\n\n")
-print(x[0][0])
-print(len(x[0][0]))
-print("\n\n")
-print(x[0][0][0])
-print("\n\n")
-print(x[0][0][0][0])
+g,x = getTrainingData("testDir")
