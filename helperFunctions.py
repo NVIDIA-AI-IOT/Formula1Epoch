@@ -58,6 +58,3 @@ def splitList(bigAr):
     normalArray = array[:split]
     testArray = array[split:]
     return normalArray, testArray
-
-trainX, trainY = getTrainingData("/home/ricky/testDir/")
-print(trainX)
