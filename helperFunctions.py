@@ -7,9 +7,13 @@ import glob
 def getTrainingData(path):
     # return training sata
     pixelList = []
+    print("Hello world")
+    print("Your path is: " + path)
 
     for filename in glob.glob(path+"*.jpg"):
+        print(filename)
         im = Image.open(filename)
+
         pixelList.append(imageToPixels(im))
 
     trainX, finalX = splitImage(pixelList)
@@ -43,7 +47,8 @@ def parseTextFile(path):
 
 def splitImage(bigAr):
     # 4/5 of data is training data, the rest is testing data
-    array = bigAr[0]
+    print(bigAr)
+    array = bigAr
     split = len(array)*4/5
     normalArray = array[:split]
     testArray = array[split:]
