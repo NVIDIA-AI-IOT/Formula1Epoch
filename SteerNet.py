@@ -52,8 +52,8 @@ def trainModel(model, imgIn, jstkOut):
 
 def testModel(model, testX, testY):
     # Test model and evauluate accuracy, prints it
-    scores = model.evaluate(testX, testY)
-    print("\nAccuracy: " + model.metrics_name[1], scores[1]*100)
+    # scores = model.evaluate(testX, testY)
+    # print("\nAccuracy: " + model.metrics_name[1], scores[1]*100)
 
 def main():
     #Main Function, starts with path inputs
@@ -66,6 +66,6 @@ def main():
     steerModel = model()
     #Trains model with the function
     trModel = trainModel(steerModel, imgAr, jstkAr)
-    testModel(model, testX, testY)
+    #testModel(trModel, testX, testY)
 
 main()
