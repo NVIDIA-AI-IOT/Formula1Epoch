@@ -24,7 +24,7 @@ def getTrainingData(p):
 
     #Opens all images in the given filepath
     for f in glob.glob(path+"*.png"):
-#        print("filename: " + f)
+        print("filename: " + f)
         im = Image.open(f)
         # pArr = np.array(im)
         # print("Parr")
@@ -38,6 +38,7 @@ def getTrainingData(p):
         # pixelList.append(pixelArr)
 
     #Splits images into validation and training data
+    pixelList = pixelList[:len(pixelList)-1]
     trainX, finalX = splitImage(pixelList)
     return trainX, finalX
 
@@ -108,7 +109,7 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
                 output.append(j.axis)
                 break
 
-    o = output[49:482]
+    o = output[49:481]
     print(len(o))
     return o
 
@@ -124,7 +125,8 @@ class JoyInput:
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000)
 
 x = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-y, h = getTrainingData('/home/ricky/testDir2')
+y, h = getTrainingData('/media/ricky/ZED/images/')
 
 print("Output: ")
-print(h)
+
+print(len(y)+len(h))
