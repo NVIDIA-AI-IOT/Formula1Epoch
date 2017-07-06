@@ -4,7 +4,7 @@ echo "Clearing files..."
 cd ~/Formula1Epoch/datacollection/cameratest
 echo "Clearing count.txt..."
 > count.txt
-echo "0" > count.txt
+echo "10000" > count.txt
 echo "done."
 echo "Clearing timestamp.txt..."
 > timestamp.txt
@@ -25,7 +25,7 @@ sleep 10
 echo "done."
 cd
 echo "Starting joystick collection..."
-xterm -e "rostopic echo /vesc/joy > /media/ubuntu/A802-B19C/joydata.txt & echo collecting joy data..." &
+xterm -e "rostopic echo /vesc/joy > /media/ubuntu/A802-B19C/joydata.txt" &
 echo "done."
 echo "Starting camera collection..."
 cd ~/Formula1Epoch/datacollection/cameratest
