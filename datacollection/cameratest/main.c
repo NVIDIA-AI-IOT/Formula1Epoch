@@ -32,21 +32,21 @@ int main(int argc, char *argv[]) {
         perror("open");
         exit(1);
     } else {
-        printf("Camera open yay!\n");
+        printf("Camera opened.\n");
     }
 
     if(ioctl(fd, VIDIOC_QUERYCAP, &cap) < 0) {
         perror("VIDIOC_QUERYCAP");
         exit(1);
     } else {
-        printf("Query worked yay!\n");
+        printf("Query worked\n");
     }
 
     if(!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
         fprintf(stderr, "The device does not handle single-planar video capture. \n");
         exit(1);
     } else {
-	printf("Passed capabilities yay!\n");
+	printf("Passed capabilities\n");
     }
     
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -119,10 +119,10 @@ int main(int argc, char *argv[]) {
     unsigned long long millisec = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
 
     // Set up for image file name
-    int jpgfile;
+    int jpegfile;
 
-    char* imagepath = "images/image_";
-    char* imagejpg = ".jpeg";
+    char* imagepath = "images/";
+    char* imagejpeg = ".jpeg";
     char* imagenum;
     char* fullimagepath;
 
@@ -141,8 +141,10 @@ int main(int argc, char *argv[]) {
     unsigned long long start_t = millisec;
     unsigned long long end_t = millisec;
     unsigned long long total_t;
+    
+    char character;
 
-    for (int i = 0; i < i + 1; i++) { // infinite loop, change this to be less stupid
+    while (character != 'q') { // no longer stupid
        if(ioctl(fd, VIDIOC_QBUF, &bufferstreaminfo) < 0) {
 	    perror("VIDIOC_QBUF");
             exit(1);
@@ -194,28 +196,32 @@ int main(int argc, char *argv[]) {
             imagenum = malloc(16);
             snprintf(imagenum, 16, "%d", count);
          
-	    fullimagepath = malloc(strlen(imagepath) + strlen(imagenum) + strlen(imagejpg));
+	    fullimagepath = malloc(strlen(imagepath) + strlen(imagenum) + strlen(imagejpeg));
             strcpy(fullimagepath, imagepath);
             strcat(fullimagepath, imagenum);
-            strcat(fullimagepath, imagejpg);
+            strcat(fullimagepath, imagejpeg);
  //        printf("%s \n", fullimagepath);
 
             // writing to image
-            if((jpgfile = open(fullimagepath, O_WRONLY | O_CREAT, 0660)) < 0){
+            if((jpegfile = open(fullimagepath, O_WRONLY | O_CREAT, 0660)) < 0){
                  perror("open");
                  exit(1);
             } else {
 //     	         printf("Opened image\n");
             }
 
-            write(jpgfile, buffer_start, bufferstreaminfo.length);
-            close(jpgfile);
+            write(jpegfile, buffer_start, bufferstreaminfo.length);
+            close(jpegfile);
             free(fullimagepath);
-	}
-
+	}	
 
 	lastseconds = tv.tv_sec;
-	printf("Seconds: %llu \n", lastseconds);	
+	printf("Seconds: %llu \n", lastseconds);
+	character = getchar();
+	getchar();
+	if (character == 'q') {
+	    exit(1);
+	}
 
      }
 
@@ -224,7 +230,7 @@ int main(int argc, char *argv[]) {
  	 perror("VIDIOC_STREAMOFF");
 	 exit(1);
      }
-     // Writing as jpg
+     // Writing as jpeg
      close(fd);
 
         
