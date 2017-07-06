@@ -1,9 +1,0 @@
-cd racecar-ws
-source devel/setup.bash
-roslaunch racecar teleop.launch
-
-rostopic echo /vesc/joy > /media/ubuntu/A802-B19C/joydata.txt
-
-cd datacollection/cameratest
-gcc -o test main.c
-./test

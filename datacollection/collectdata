@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "DATA COLLECTION"
 echo "Clearing files..."
-cd ~/Formula1Epoch/datacollection/cameratest
+cd ~/Formula1Epoch/datacollection/data/camera
 echo "Clearing count.txt..."
 > count.txt
 echo "10000" > count.txt
@@ -13,25 +13,24 @@ echo "Clearing images..."
 rm images/*
 echo "done."
 echo "Clearing joydata.txt..."
-cd
-> /media/ubuntu/A802-B19C/joydata.txt
+> ~/Formula1Epoch/datacollection/data/joydata.txt
 echo "done."
 echo "Cleared files."
 echo "Starting collection..."
 echo "Starting racecar..."
-cd racecar-ws
+cd ~/racecar-ws
 xterm -e "source devel/setup.bash && roslaunch racecar teleop.launch" &
 sleep 10
 echo "done."
 cd
 echo "Starting joystick collection..."
-xterm -e "rostopic echo /vesc/joy > /media/ubuntu/A802-B19C/joydata.txt" &
+xterm -e "rostopic echo /vesc/joy > ~/Formula1Epoch/datacollection/data/joydata.txt" &
 echo "done."
 echo "Starting camera collection..."
-cd ~/Formula1Epoch/datacollection/cameratest
-gcc -o test ~/Formula1Epoch/datacollection/cameratest/main.c
+cd ~/Formula1Epoch/datacollection/data/camera
+gcc -o test ~/Formula1Epoch/datacollection/data/camera/main.c
 sleep 10
 ./test &
-echo "Collection started." &
+echo "ALL COLLECTION STARTED" &
 wait
 
