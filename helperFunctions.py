@@ -18,14 +18,25 @@ def getTrainingData(p):
         else:
             path = os.getcwd() + "/" + p + "/"
 
+    print("Path: " + path)
     #Return training data
     pixelList = []
 
     #Opens all images in the given filepath
-    for filename in glob.glob(path+"*.jpg"):
-        im = Image.open(filename)
-        #print(im)
-        pixelList.append(imageToPixels(im))
+    for f in glob.glob(path+"*.png"):
+#        print("filename: " + f)
+        im = Image.open(f)
+        # pArr = np.array(im)
+        # print("Parr")
+        # print(pArr)
+        pArr = imageToPixels(im)
+        pixelList.append(pArr)
+
+        # pixelArr = imageToPixels(im)
+        # print("pixelArr: ")
+        # print(pixelArr)
+        # pixelList.append(pixelArr)
+
     #Splits images into validation and training data
     trainX, finalX = splitImage(pixelList)
     return trainX, finalX
@@ -113,6 +124,7 @@ class JoyInput:
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000)
 
 x = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-y, h = getTrainingData('/home/ricky/Desktop/images')
+y, h = getTrainingData('/home/ricky/testDir2')
 
-print(y)
+print("Output: ")
+print(h)
