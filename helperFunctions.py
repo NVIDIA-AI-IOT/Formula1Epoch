@@ -110,7 +110,7 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
                 output.append(j.axis)   # We want the raw axis value (left-right) for the respective joyInput.
                 break
 
-    output = output[1:]
+    output = output[1:] # For prediction purposes, we need to take the joystick val before the image
     trainY, testY = splitImage(output)
     return trainY, testY
 
