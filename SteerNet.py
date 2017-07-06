@@ -5,14 +5,13 @@ import numpy as np
 from keras.models import Model, load_model, Sequential
 from keras.optimizers import Adam
 from keras.layers import Input, Convolution2D, MaxPooling2D, Activation, Dropout, Flatten, Dense
-import cv2
 import helperFunctions
 from keras.utils import plot_model
 
 def model():
     #Model with 3 hidden layers
     #Input takes in image
-    img = Input(shape = (672, 376, 3), name = 'img')
+    img = Input(shape = (376, 672, 3), name = 'img')
     #Convolution/Pooling Layer 1
     x = Convolution2D(8, 3, 3)(img)
     x = Activation('relu')(x)
@@ -42,11 +41,11 @@ def model():
 def trainModel(model, imgIn, jstkOut):
     #Trains predefined model with verbose logging, input image data and output steering data
     model.fit(x=imgIn, y=jstkOut, batch_size=32, epochs=100, verbose=2, callbacks=None, validation_split=0.2, shuffle=True, initial_epoch=0)
-    modelName = raw_input("Please enter the trained models filename")
+    modelName = raw_input("Please enter the trained models filename: ")
     modelPng = modelName + ".png"
     modelName = modelName + ".h5"
     #Plots the trained model
-    plot_model(steerNet, to_file=modelPng)
+    plot_model(model, to_file=modelPng)
     model.save(modelName)
     print("Saved as %s" %(modelName) )
     return model
@@ -58,8 +57,8 @@ def testModel(model, testX, testY):
 
 def main():
     #Main Function, starts with path inputs
-    imagePath = raw_input("Please enter the filepath to your images folder")
-    labelPath = raw_input("Please enter the filepath to your labels folder")
+    #imagePath = raw_input("Please enter the filepath to your images folder")
+    #labelPath = raw_input("Please enter the filepath to your labels folder")
     #Uses helper functions to get array of images and outputs
     imgAr, testX = helperFunctions.getTrainingData('/media/ricky/ZED/images/')
     jstkAr, testY = helperFunctions.mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
