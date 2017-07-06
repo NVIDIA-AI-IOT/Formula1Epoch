@@ -23,7 +23,7 @@ def getTrainingData(p):
     pixelList = []
 
     #Opens all images in the given filepath
-    for f in glob.glob(path+"*.png"):
+    for f in glob.glob(path+"*.png"):   # PIL does not work with JPEG images
         print("filename: " + f)
         im = Image.open(f)
         # pArr = np.array(im)
@@ -77,23 +77,23 @@ def splitList(bigAr):
 
 def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
     joyStickTimeStamps = [] # Raw output from ROS
-    imageTimeStamps = []
-
-    joysticks = []
-
+    imageTimeStamps = [] # Raw output from imageTimeStamps
+    joysticks = []  # Array for the Joystick Objects
     output = []
-    joyValues = []
 
     f = open(joyDataTxt, 'r').read()
     g = open(imageTimeStampTxt, 'r').read()
 
-    iData = g.split('\n')
-    iData.pop(len(iData)-1)
+    # Format image timestamp data
+    imageTStamps = g.split('\n')
+    imageTStamps.pop(len(imageTStamps)-1)
 
+    # Format raw ROS joystick data
     joydata = f.split('---')
     joydata.pop(len(joydata)-1)
 
-    for tStamp in iData:
+    # Array of image time stamps is merely for convenience
+    for tStamp in imageTStamps:
         imageTimeStamps.append(long(tStamp))
 
     for d in joydata:
@@ -101,32 +101,29 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
         joysticks.append(joy)
         joyStickTimeStamps.append(long(joy.timeStamp))
 
-    for im in iData:
+    for im in imageTStamps:
+        # For every image, find the joystick input whose timestamp is closest to the image timestamp
         closest = min(joyStickTimeStamps, key=lambda x: abs(x-long(im)))
 
         for j in joysticks:
             if j.timeStamp == closest:
-                output.append(j.axis)
+                output.append(j.axis)   # We want the raw axis value (left-right) for the respective joyInput.
                 break
 
-    o = output[49:481]
-    print(len(o))
-    return o
-
-def remove_duplicates(l):
-    return list(set(l))
+    output = output[1:]
+    trainY, testY = splitImage(output)
+    return trainY, testY
 
 class JoyInput:
      def __init__(self, joyText):
-         self.secs = long(joyText[41:52])
+         self.secs = long(joyText[41:52]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
-         self.axis = float(comm[3])
-         self.timeStamp = long(self.secs*1000 + self.nsecs/1000000)
+         self.axis = float(comm[3]) # left-right axis value
+         self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
 
-x = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-y, h = getTrainingData('/media/ricky/ZED/images/')
+#x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+#y, h = getTrainingData('/media/ricky/ZED/images/')
 
-print("Output: ")
-
-print(len(y)+len(h))
+print("Output Length: " + str(len(y) + len(h)))
+print(len(x)+len(m))
