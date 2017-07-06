@@ -24,7 +24,6 @@ def getTrainingData(p):
 
     #Opens all images in the given filepath
     for f in glob.glob(path+"*.png"):   # PIL does not work with JPEG images
-        print("filename: " + f)
         im = Image.open(f)
         # pArr = np.array(im)
         # print("Parr")
@@ -40,13 +39,12 @@ def getTrainingData(p):
     #Splits images into validation and training data
     pixelList = pixelList[:len(pixelList)-1]
     trainX, finalX = splitImage(pixelList)
-    return trainX, finalX
+    return np.array(trainX), np.array(finalX)
 
 def imageToPixels(image):
     #Resizes the image and extracts pixels
     resize = image.resize((672, 376), Image.NEAREST)
-    image_convert = np.swapaxes(np.swapaxes(resize, 1, 2), 0, 1)
-    img = np.array(image_convert)
+    img = np.array(resize)
     return img
 
 def parseTextFile(data):
@@ -124,6 +122,3 @@ class JoyInput:
 
 #x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #y, h = getTrainingData('/media/ricky/ZED/images/')
-
-print("Output Length: " + str(len(y) + len(h)))
-print(len(x)+len(m))
