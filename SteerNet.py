@@ -1,4 +1,4 @@
-import tensorflow as tf
+#import tensorflow as tf
 import numpy as np
 #import matplotlib
 #from matplotlib.pyplot import imshow
@@ -61,8 +61,8 @@ def main():
     imagePath = raw_input("Please enter the filepath to your images folder")
     labelPath = raw_input("Please enter the filepath to your labels folder")
     #Uses helper functions to get array of images and outputs
-    imgAr, testX = helperFunctions.getTrainingData(imagePath)
-    jstkAr, testY = helperFunctions.parseTextFile(labelPath)
+    imgAr, testX = helperFunctions.getTrainingData('/media/ricky/ZED/images/')
+    jstkAr, testY = helperFunctions.mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
     #Runs model function to initialize model
     steerModel = model()
     #Trains model with the function

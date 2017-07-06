@@ -18,15 +18,27 @@ def getTrainingData(p):
         else:
             path = os.getcwd() + "/" + p + "/"
 
+    print("Path: " + path)
     #Return training data
     pixelList = []
 
     #Opens all images in the given filepath
-    for filename in glob.glob(path+"*.jpg"):
-        im = Image.open(filename)
-        #print(im)
-        pixelList.append(imageToPixels(im))
-    #Splits images into validation and training date
+    for f in glob.glob(path+"*.png"):   # PIL does not work with JPEG images
+        print("filename: " + f)
+        im = Image.open(f)
+        # pArr = np.array(im)
+        # print("Parr")
+        # print(pArr)
+        pArr = imageToPixels(im)
+        pixelList.append(pArr)
+
+        # pixelArr = imageToPixels(im)
+        # print("pixelArr: ")
+        # print(pixelArr)
+        # pixelList.append(pixelArr)
+
+    #Splits images into validation and training data
+    pixelList = pixelList[:len(pixelList)-1]
     trainX, finalX = splitImage(pixelList)
     return trainX, finalX
 
@@ -37,21 +49,7 @@ def imageToPixels(image):
     img = np.array(image_convert)
     return img
 
-def parseTextFile(path):
-    #Opens text file with given steering values in a '<>,<>,<>' format
-    f = open(path, 'r')
-
-    readings = []
-    data = []
-    #Formats and extracts data, appending to array
-    for t in f:
-        readings.append(t.strip('\n'))
-
-    for r in readings:
-
-        arr = r.split(',')
-        data.append(arr)
-    #Splits text data for steering into training and validation
+def parseTextFile(data):
     trainY, finalY = splitList(data)
     return trainY, finalY
 
@@ -77,4 +75,55 @@ def splitList(bigAr):
     #Returns split
     return normalArray, testArray
 
-#g,x = getTrainingData("testDir")
+def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
+    joyStickTimeStamps = [] # Raw output from ROS
+    imageTimeStamps = [] # Raw output from imageTimeStamps
+    joysticks = []  # Array for the Joystick Objects
+    output = []
+
+    f = open(joyDataTxt, 'r').read()
+    g = open(imageTimeStampTxt, 'r').read()
+
+    # Format image timestamp data
+    imageTStamps = g.split('\n')
+    imageTStamps.pop(len(imageTStamps)-1)
+
+    # Format raw ROS joystick data
+    joydata = f.split('---')
+    joydata.pop(len(joydata)-1)
+
+    # Array of image time stamps is merely for convenience
+    for tStamp in imageTStamps:
+        imageTimeStamps.append(long(tStamp))
+
+    for d in joydata:
+        joy = JoyInput(d)
+        joysticks.append(joy)
+        joyStickTimeStamps.append(long(joy.timeStamp))
+
+    for im in imageTStamps:
+        # For every image, find the joystick input whose timestamp is closest to the image timestamp
+        closest = min(joyStickTimeStamps, key=lambda x: abs(x-long(im)))
+
+        for j in joysticks:
+            if j.timeStamp == closest:
+                output.append(j.axis)   # We want the raw axis value (left-right) for the respective joyInput.
+                break
+
+    output = output[1:] # For prediction purposes, we need to take the joystick val before the image
+    trainY, testY = splitImage(output)
+    return trainY, testY
+
+class JoyInput:
+     def __init__(self, joyText):
+         self.secs = long(joyText[41:52]) # these are the character locations of these values
+         self.nsecs = long(joyText[64:73])
+         comm = joyText.split(',')
+         self.axis = float(comm[3]) # left-right axis value
+         self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
+
+#x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+#y, h = getTrainingData('/media/ricky/ZED/images/')
+
+print("Output Length: " + str(len(y) + len(h)))
+print(len(x)+len(m))
