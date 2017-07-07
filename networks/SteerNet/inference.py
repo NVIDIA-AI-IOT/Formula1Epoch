@@ -15,13 +15,14 @@ from PIL import Image
 
 pygame.init()
 pygame.camera.init()
-
+name = 10000
 cam = pygame.camera.Camera("/dev/video0",(672,376))
 cam.start()
 print('preload')
 model = keras.models.load_model('/home/ubuntu/model.h5')
 print('meme')
 def infer():
+	global name
 	print('running infer')
 	image = cam.get_image()
 	image = pygame.surfarray.array3d(image)
@@ -31,9 +32,24 @@ def infer():
 	img = imageToPixels(image)
 	im2 = Image.fromarray(img, 'RGB')
 	resize = im2.resize((672, 376), Image.NEAREST)
+	#resive.save(str(name)+'.png')
+	newIm = resize
+	#name += 1
 	resize = np.array(resize)
 	o = model.predict(np.array([resize]), batch_size=32, verbose=2)
 	output = o[0]
 	jstk = output[0]
+	saveImTxt(newIm, jstk)
+	#fil = open(str(name)+".txt","w")
+	#fil.write(jstk)
+	#fil.close
+	#name += 1
 	return jstk
 
+def saveImTxt(image, jstk):
+		global name
+		image.save(str(name)+'.png')
+		fil = open(str(name)+".txt","w")
+		fil.write(jstk)
+		fil.close
+		name += 1
