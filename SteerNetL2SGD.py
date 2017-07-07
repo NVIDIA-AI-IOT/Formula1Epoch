@@ -70,4 +70,4 @@ def main():
     #Trains model with the function
     trModel = trainModel(steerModel, imgAr, jstkAr)
 
-model()
+main()
