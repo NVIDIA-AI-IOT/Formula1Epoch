@@ -13,7 +13,7 @@ from rosservice import ROSServiceException
 
 import numpy as np
 
-from inference import infer
+from inference import getJoyVal
 
 class JoyTeleopException(Exception):
     pass
@@ -171,7 +171,7 @@ class JoyTeleop:
         # Check if this is a default command
         if 'is_default' not in command:
             command['is_default'] = False
-        
+
         if command['type'] == 'topic':
             if 'deadman_buttons' not in command:
                 command['deadman_buttons'] = []
@@ -232,12 +232,11 @@ class JoyTeleop:
                     joy_value = 0.5
                   else:
                     print('going to infer')
-                    joy_value = infer()
+                    joy_value = getJoyVal()
                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
- 
                 self.set_member(msg, mapping['target'], val)
-                
+
         self.publishers[cmd['topic_name']].publish(msg)
 
     def run_action(self, c, joy_state):
