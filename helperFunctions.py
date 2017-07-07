@@ -38,8 +38,8 @@ def getTrainingData(p):
 
     #Splits images into validation and training data
     pixelList = pixelList[:len(pixelList)-1]
-    trainX, finalX = splitImage(pixelList)
-    return np.array(trainX), np.array(finalX)
+    trainX = splitImage(pixelList)
+    return np.array(trainX)
 
 def imageToPixels(image):
     #Resizes the image and extracts pixels
@@ -109,8 +109,12 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
                 break
 
     output = output[1:] # For prediction purposes, we need to take the joystick val before the image
-    trainY, testY = splitImage(output)
-    return trainY, testY
+    trainY = output
+    for index, item in enumerate(trainY):
+        y = trainY[index]
+        y = y * 50
+        trainY[index] = y
+    return trainY
 
 class JoyInput:
      def __init__(self, joyText):
