@@ -18,9 +18,16 @@ pygame.camera.init()
 
 cam = pygame.camera.Camera("/dev/video0",(672,376))
 cam.start()
-print('preload')
 model = keras.models.load_model('/home/ubuntu/model.h5')
-print('meme')
+
+global joyVal # usage .get()
+
+def getJoyVal():
+	return joyVal
+
+def runInference():
+	joyVal = pool.apply_async(runInference).get()
+
 def infer():
 	print('running infer')
 	image = cam.get_image()
@@ -37,3 +44,7 @@ def infer():
 	jstk = output[0]
 	return jstk
 
+# async_result = pool.apply_async(foo, ('world', 'foo')) # tuple of args for foo
+# # do some other stuff in the main process
+#
+# return_val = async_result.get()  # get the return value from your function.
