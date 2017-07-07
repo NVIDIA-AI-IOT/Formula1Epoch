@@ -26,7 +26,7 @@ def getJoyVal():
 	return joyVal
 
 def runInference():
-	joyVal = pool.apply_async(runInference).get()
+	joyVal = pool.apply_async(infer).get()
 
 def infer():
 	global name
