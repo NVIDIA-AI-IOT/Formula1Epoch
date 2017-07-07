@@ -18,9 +18,16 @@ pygame.camera.init()
 name = 10000
 cam = pygame.camera.Camera("/dev/video0",(672,376))
 cam.start()
-print('preload')
 model = keras.models.load_model('/home/ubuntu/model.h5')
-print('meme')
+
+global joyVal # usage .get()
+
+def getJoyVal():
+	return joyVal
+
+def runInference():
+	joyVal = pool.apply_async(infer).get()
+
 def infer():
 	global name
 	print('running infer')
