@@ -17,6 +17,8 @@
 
 #include <linux/videodev2.h>
 
+#include <signal.h>
+
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 struct v4l2_capability cap;
@@ -26,7 +28,14 @@ struct v4l2_buffer bufferinfo;
 struct v4l2_buffer bufferstreaminfo;
 struct timeval tv;
 
+static volatile int exitHandle = 1;
+
+void intHandler(int exitSignal) {
+    exitHandle = 0;
+}
+
 int main(int argc, char *argv[]) {
+
     int fd;
     if ((fd = open("/dev/video0", O_RDWR)) < 0) { // make sure to change accordingly
         perror("open");
@@ -121,7 +130,7 @@ int main(int argc, char *argv[]) {
     // Set up for image file name
     int jpegfile;
 
-    char* imagepath = "images/";
+    char* imagepath = "/images/";
     char* imagejpeg = ".jpeg";
     char* imagenum;
     char* fullimagepath;
@@ -142,9 +151,9 @@ int main(int argc, char *argv[]) {
     unsigned long long end_t = millisec;
     unsigned long long total_t;
     
-    char character;
+    signal(SIGINT, intHandler);
 
-    while (character != 'q') { // no longer stupid
+    while (exitHandle) { // no longer stupid
        if(ioctl(fd, VIDIOC_QBUF, &bufferstreaminfo) < 0) {
 	    perror("VIDIOC_QBUF");
             exit(1);
@@ -217,11 +226,6 @@ int main(int argc, char *argv[]) {
 
 	lastseconds = tv.tv_sec;
 	printf("Seconds: %llu \n", lastseconds);
-	character = getchar();
-	getchar();
-	if (character == 'q') {
-	    exit(1);
-	}
 
      }
 

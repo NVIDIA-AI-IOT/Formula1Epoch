@@ -13,6 +13,8 @@ from rosservice import ROSServiceException
 
 import numpy as np
 
+from inference import infer
+
 class JoyTeleopException(Exception):
     pass
 
@@ -22,9 +24,8 @@ Pulled on April 28, 2017.
 
 Edited by Winter Guerra on April 28, 2017 to allow for default actions.
 
-Edited by the Formula 1 Epoch team on July 6, 2017 to add autonomous functions.
+Edited by the Formula 1 Epoch team in July 2017 to add autonomous functions.
 '''
-
 
 class JoyTeleop:
     """
@@ -50,7 +51,7 @@ class JoyTeleop:
 
         teleop_cfg = rospy.get_param("teleop")
 	joy_value = 0; # Fake joy value
-        start_time = time.time()
+#        start_time = time.time()
 
         for i in teleop_cfg:
             if i in self.command_list:
@@ -211,6 +212,7 @@ class JoyTeleop:
                                      .format(command))
 
     def run_topic(self, c, joy_state):
+	print('runtopic')
         cmd = self.command_list[c]
         msg = self.get_message_type(cmd['message_type'])()
 
@@ -219,7 +221,7 @@ class JoyTeleop:
                 self.set_member(msg, param['target'], param['value'])
 
         else:
-            elapsed_time = time.time() - start_time;
+#            elapsed_time = time.time() - start_time;
             for mapping in cmd['axis_mappings']:
                 if len(joy_state.axes)<=mapping['axis']:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
@@ -227,12 +229,10 @@ class JoyTeleop:
                 else:
 #                    val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
                   if mapping['axis'] == 1:
-                    if  elapsed_time < 10: # runs for 10 seconds
-                      joy_value = 1
-                    else:
-                      joy_value = 0
+                    joy_value = 0.5
                   else:
-                    joy_value = 0;
+                    print('going to infer')
+                    joy_value = infer()
                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
  
