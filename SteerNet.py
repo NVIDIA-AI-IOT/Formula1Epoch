@@ -15,7 +15,7 @@ csv = CSVLogger('SteerNetSimple.csv', separator='\n', append=True)
 def model():
     #Model with 3 hidden layers
     #Input takes in image
-    img = Input(shape = (672, 376, 3), name = 'img')
+    img = Input(shape = (376, 672, 3), name = 'img')
     #Convolution/Pooling Layer 1
     x = Convolution2D(4, 3, 3)(img)
     x = Activation('relu')(x)
@@ -67,6 +67,7 @@ def main():
     #Uses helper functions to get array of images and outputs
     imgAr = helperFunctions.getTrainingData('/media/ricky/ZED/images/')
     jstkAr = helperFunctions.mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+    print(imgAr)
     #Runs model function to initialize model
     steerModel = model()
     #Trains model with the function

@@ -38,7 +38,15 @@ def getTrainingData(p):
 
     #Splits images into validation and training data
     pixelList = pixelList[:len(pixelList)-1]
-    trainX = splitImage(pixelList)
+    trainX = pixelList
+    print(len(trainX))
+    print(len(trainX[0]))
+    w = trainX[0]
+    print(len(w[0]))
+    z = w[0]
+    print(len(z[0]))
+    p = z[0]
+    print(p[0])
     return np.array(trainX)
 
 def imageToPixels(image):
@@ -114,11 +122,12 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
         y = trainY[index]
         y = y * 50
         trainY[index] = y
+        print(trainY[index])
     return trainY
 
 class JoyInput:
      def __init__(self, joyText):
-         self.secs = long(joyText[41:52]) # these are the character locations of these values
+         self.secs = long(joyText[43:54]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
          self.axis = float(comm[3]) # left-right axis value

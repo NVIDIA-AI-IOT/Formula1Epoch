@@ -14,7 +14,7 @@ from keras.utils import plot_model
 def model():
     #Model with 3 hidden layers
     #Input takes in image
-    img = Input(shape = (672, 376, 3), name = 'img')
+    img = Input(shape = (376, 672, 3), name = 'img')
     #Convolution/Pooling Layer 1
     x = Convolution2D(8, 3, 3)(img)
     x = Activation('relu')(x)

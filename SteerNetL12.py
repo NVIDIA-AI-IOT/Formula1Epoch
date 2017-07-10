@@ -13,7 +13,7 @@ from keras import regularizers
 def model():
     #Model with 3 hidden layers
     #Input takes in image
-    img = Input(shape = (672, 376, 3), name = 'img')
+    img = Input(shape = (376, 672, 3), name = 'img')
     #Convolution/Pooling Layer 1
     x = Convolution2D(4, 3, 3, kernel_regularizer=regularizers.l1_l2(0.005))(img)
     x = Activation('relu')(x)
