@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import importlib
-
 import rospy
 import genpy.message
 from rospy import ROSException
@@ -10,10 +9,9 @@ import rostopic
 import rosservice
 from threading import Thread
 from rosservice import ROSServiceException
-
+from multiprocessing.pool import ThreadPool
 import numpy as np
-
-from inference import getJoyVal
+from threadTest import ThreadingExample
 
 class JoyTeleopException(Exception):
     pass
@@ -33,7 +31,11 @@ class JoyTeleop:
     Will not start without configuration, has to be stored in 'teleop' parameter.
     See config/joy_teleop.yaml for an example.
     """
+
     def __init__(self):
+
+	self.thread = ThreadingExample()
+
         if not rospy.has_param("teleop"):
             rospy.logfatal("no configuration was found, taking node down")
             raise JoyTeleopException("no config")
@@ -51,7 +53,7 @@ class JoyTeleop:
 
         teleop_cfg = rospy.get_param("teleop")
 	joy_value = 0; # Fake joy value
-#        start_time = time.time()
+#       start_time = time.time()
 
         for i in teleop_cfg:
             if i in self.command_list:
@@ -227,12 +229,12 @@ class JoyTeleop:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
                   val = 0.0
                 else:
-#                    val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+                    #val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
                   if mapping['axis'] == 1:
                     joy_value = 0.5
                   else:
                     print('going to infer')
-                    joy_value = getJoyVal()
+                    joy_value = self.thread.getVar()
                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
                 self.set_member(msg, mapping['target'], val)
@@ -298,7 +300,6 @@ class JoyTeleop:
             if cmd['action_name'] in self.offline_actions:
                 self.register_action(name, cmd)
 
-
 if __name__ == "__main__":
     try:
         rospy.init_node('joy_teleop')
@@ -308,3 +309,4 @@ if __name__ == "__main__":
         pass
     except rospy.ROSInterruptException:
         pass
+

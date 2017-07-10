@@ -18,7 +18,7 @@ pygame.camera.init()
 name = 10000
 cam = pygame.camera.Camera("/dev/video0",(672,376))
 cam.start()
-model = keras.models.load_model('/home/ricky/model.h5')
+model = keras.models.load_model('/home/ubuntu/model.h5')
 
 # global joyVal # usage .get()
 #
@@ -42,7 +42,7 @@ def infer():
 	img = imageToPixels(image)
 	im2 = Image.fromarray(img, 'RGB')
 	resize = im2.resize((672, 376), Image.NEAREST)
-	#resive.save(str(name)+'.png')
+	#resize.save(str(name)+'.png')
 	newIm = resize
 	#name += 1
 	resize = np.array(resize)
@@ -56,7 +56,6 @@ def infer():
 	#name += 1
 #	print("ATIJTFDJG: " + str(jstk))
 	jstk = clamp(jstk, -10, 10)
-	jstk /= 10
 	return jstk
 
 # def saveImTxt(image, jstk):
