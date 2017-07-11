@@ -5,19 +5,16 @@ from keras.layers import Input, Convolution2D, MaxPooling2D, Activation, Dropout
 from helperFunctions import imageToPixels
 from keras.utils import plot_model
 #import tensorflow as tf
-import pygame
-import pygame.camera
 import keras
 from pygame.locals import *
-import h5py
 import time
 from PIL import Image
+import cv2
 
-pygame.init()
-pygame.camera.init()
+cap = cv2.VideoCapture(0) #make sure this is right
+width = 672
+height = 376
 name = 10000
-cam = pygame.camera.Camera("/dev/video0",(672,376))
-cam.start()
 model = keras.models.load_model('/home/ubuntu/model.h5')
 
 # global joyVal # usage .get()
@@ -34,19 +31,15 @@ def clamp(n, minn, maxn):
 def infer():
 	global name
 #	print('running infer')
-	image = cam.get_image()
-	image = pygame.surfarray.array3d(image)
 #	print(len(image))
 	#time.sleep(10)
 	global model
-	img = imageToPixels(image)
-	im2 = Image.fromarray(img, 'RGB')
-	resize = im2.resize((672, 376), Image.NEAREST)
 	#resize.save(str(name)+'.png')
-	newIm = resize
 	#name += 1
-	resize = np.array(resize)
-	o = model.predict(np.array([resize]), batch_size=32, verbose=2)
+        ret, frame = cap.read()
+        resized = cv2.resize(frame, (width, height))
+
+	o = model.predict(np.array([resized]), batch_size=32, verbose=2)
 	output = o[0]
 	jstk = output[0]
 	#saveImTxt(newIm, jstk)
