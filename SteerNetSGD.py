@@ -9,6 +9,8 @@ import cv2
 import helperFunctions
 from keras.utils import plot_model
 
+from keras.callbacks import CSVLogger
+csv = CSVLogger('SteerNetSimple.csv', separator='\n', append=True)
 
 
 def model():
@@ -48,7 +50,7 @@ def trainModel(model, imgIn, jstkOut):
     modelPng = modelName + ".png"
     modelName = modelName + ".h5"
     #Plots the trained model
-    plot_model(steerNet, to_file=modelPng)
+    #plot_model(steerNet, to_file=modelPng)
     model.save(modelName)
     print("Saved as %s" %(modelName) )
     return model

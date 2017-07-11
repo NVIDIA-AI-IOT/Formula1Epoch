@@ -1,3 +1,10 @@
+"""
+
+HAS A DIFFERENT LEARNING RATE
+
+"""
+
+
 #import tensorflow as tf
 import numpy as np
 #import matplotlib
@@ -9,13 +16,14 @@ import cv2
 import helperFunctions
 from keras.utils import plot_model
 from keras import regularizers
+from keras.callbacks import CSVLogger
 
-
+csv = CSVLogger('SteerNetSimple.csv', separator='\n', append=True)
 
 def model():
     #Model with 3 hidden layers
     #Input takes in image
-    img = Input(shape = (376, 672, 3), name = 'img')
+    img = Input(shape = (376, 672, 3), name = 'img') # main input
     #Convolution/Pooling Layer 1
     x = Convolution2D(4, 3, 3, kernel_regularizer=regularizers.l1(0.005))(img)
     x = Activation('relu')(x)
@@ -38,7 +46,8 @@ def model():
     jstk = Dense(1, name='jstk')(x)
     #Compiled and initializes the model
     steerNet = Model(input=[img], output=[jstk])
-    steerNet.compile(optimizer='adam', loss='mean_squared_error')
+    adamOptimizer = keras.optimizers.Adam(lr=0.000025, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    steerNet.compile(optimizer=adamOptimizer, loss='mean_squared_error')
     print(steerNet.summary())
     return steerNet
 
@@ -50,7 +59,7 @@ def trainModel(model, imgIn, jstkOut):
     modelPng = modelName + ".png"
     modelName = modelName + ".h5"
     #Plots the trained model
-    plot_model(steerNet, to_file=modelPng)
+    #plot_model(steerNet, to_file=modelPng)
     model.save(modelName)
     print("Saved as %s" %(modelName) )
     return model
