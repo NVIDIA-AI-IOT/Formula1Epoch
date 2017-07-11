@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
     // Set up for image file name
     int jpegfile;
 
-    char* imagepath = "/images/";
+    char* imagepath = "images/";
     char* imagejpeg = ".jpeg";
     char* imagenum;
     char* fullimagepath;

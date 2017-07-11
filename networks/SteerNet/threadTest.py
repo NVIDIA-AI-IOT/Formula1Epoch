@@ -1,8 +1,14 @@
 import threading
 import time
+import signal
+import sys
 from inference import infer
 
-# myGlobalVariable = 0
+myGlobalVariable = 0
+
+def signal_handler(signal, frame):
+	print ("Exit")
+	sys.exit(0)
 
 class ThreadingExample(object):
     """ Threading example class
@@ -19,7 +25,8 @@ class ThreadingExample(object):
         self.globalVar = 0
 
         thread = threading.Thread(target=self.run, args=())
-        thread.daemon = True                            # Daemonize thread
+        thread.daemon = True
+	thread.setDaemon(True)                            # Daemonize thread
         thread.start()                                  # Start the execution
 
     def returnInference():
@@ -27,19 +34,21 @@ class ThreadingExample(object):
 
     def run(self):
         """ Method that runs forever """
-        while True:
+        while(True):
             # Do something
-            #print('Updating...')
+            print('Updating...')
             self.globalVar = infer()
             #print("myGlobal: " + str(myGlobalVariable))
-            time.sleep(self.interval)
+            #time.sleep(self.interval)
 
-example = ThreadingExample()
+    def getVar(self):
+	return self.globalVar
+
 #example.run()
 
-while(True):
-    time.sleep(0.5)
-    print("My Global Val: " + str(example.globalVar))
+#while(True):
+#    time.sleep(0.5)
+#    print("My Global Val: " + str(example.globalVar))
 # time.sleep(3)
 # #print('Checkpoint')
 # time.sleep(2)
