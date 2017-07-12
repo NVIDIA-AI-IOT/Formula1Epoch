@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+import os
 import importlib
 import rospy
 import genpy.message
@@ -223,18 +225,29 @@ class JoyTeleop:
                 self.set_member(msg, param['target'], param['value'])
 
         else:
-#            elapsed_time = time.time() - start_time;
+#           elapsed_time = time.time() - start_time;
+            #cameraf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/stopCamera.txt', 'w')
+            #camera_joy = joy_state.axes[5]
+            #if camera_joy <= 0:
+            #   cameraf.write("1")
+            #else:
+	    #   cameraf.write("0")
+	    #   cameraf.close()
+
             for mapping in cmd['axis_mappings']:
                 if len(joy_state.axes)<=mapping['axis']:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
                   val = 0.0
                 else:
-                    #val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+#                    val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
                   if mapping['axis'] == 1:
                     joy_value = 0.5
                   else:
                     print('going to infer')
                     joy_value = self.thread.getVar()
+		    valsf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/vals.txt', 'a')
+		    valsf.write(str(joy_value) + "\n")
+		    valsf.close()
                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
                 self.set_member(msg, mapping['target'], val)
@@ -309,4 +322,3 @@ if __name__ == "__main__":
         pass
     except rospy.ROSInterruptException:
         pass
-

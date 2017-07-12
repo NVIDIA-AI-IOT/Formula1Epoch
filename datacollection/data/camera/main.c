@@ -150,6 +150,11 @@ int main(int argc, char *argv[]) {
     unsigned long long start_t = millisec;
     unsigned long long end_t = millisec;
     unsigned long long total_t;
+
+    // Setup for stop camera button
+    FILE* stopcamerafile;
+    char* stopcamerachar;
+    int stopcamera;
     
     signal(SIGINT, intHandler);
 
@@ -177,15 +182,19 @@ int main(int argc, char *argv[]) {
 	total_t = end_t - start_t;
 	printf("Total time: %llu \n", total_t);
 
+	// Get value for the stop camera button
+	stopcamerafile = fopen("/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/stopCamera.txt", "r");
+	fscanf(stopcamerafile, "%s", stopcamerachar);
+	sscanf(stopcamerachar, "%d", &stopcamera);
+
 	// Get 3 frames every second
- 	if (total_t > (unsigned long long)(1.0 / 3.0 * 1000)) {
+ 	if (total_t > (unsigned long long)(1.0 / 3.0 * 1000) && stopcamera != 1) {
 	    start_t = millisec;
 	    // Print the image timestamp to console
   	    printf("Timestamp: %llu", millisec);
 	    // Write the timestamp to "timestamp.txt"
             timestampnum = malloc(16);
             snprintf(timestampnum, 16, "%llu\n", millisec);
-
 	    timestampfile = fopen("timestamp.txt", "a");
 	    fprintf(timestampfile, "%llu\n", millisec);
 	    fclose(timestampfile);
@@ -222,6 +231,10 @@ int main(int argc, char *argv[]) {
             write(jpegfile, buffer_start, bufferstreaminfo.length);
             close(jpegfile);
             free(fullimagepath);
+	}
+
+	if (stopcamera == 1) {
+	    printf("WAIT A SECOND! WE ARENT COLLECTING DATA");
 	}	
 
 	lastseconds = tv.tv_sec;
@@ -240,3 +253,4 @@ int main(int argc, char *argv[]) {
         
     return EXIT_SUCCESS;
 }
+
