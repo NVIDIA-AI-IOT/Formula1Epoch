@@ -226,7 +226,7 @@ class JoyTeleop:
 
         else:
 #           elapsed_time = time.time() - start_time;
-            #cameraf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/stopCamera.txt', 'w')
+            #cameraf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/captureButton.txt', 'w')
             #camera_joy = joy_state.axes[5]
             #if camera_joy <= 0:
             #   cameraf.write("1")
