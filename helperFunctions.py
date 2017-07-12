@@ -4,7 +4,6 @@ import glob
 import os
 
 #All standalone helper functions can be defined here
-
 def getTrainingData(p):
     #Parses the filepath to access files
     if p.startswith("/"):
@@ -24,7 +23,6 @@ def getTrainingData(p):
 
     #Opens all images in the given filepath
     for f in glob.glob(path+"*.png"):   # PIL does not work with JPEG images
-        print("filename: " + f)
         im = Image.open(f)
         # pArr = np.array(im)
         # print("Parr")
@@ -39,8 +37,8 @@ def getTrainingData(p):
 
     #Splits images into validation and training data
     pixelList = pixelList[:len(pixelList)-1]
-    trainX, finalX = splitImage(pixelList)
-    return trainX, finalX
+    #trainX, finalX = splitImage(pixelList)
+    return pixelList
 
 def imageToPixels(image):
     #Resizes the image and extracts pixels
@@ -110,17 +108,59 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
                 break
 
     output = output[1:] # For prediction purposes, we need to take the joystick val before the image
-    trainY, testY = splitImage(output)
-    return trainY, testY
+    #trainY, testY = splitImage(output)
+    return output
 
+def parseLidarData(lidarText, imageTimeStampsTxt):
+    data = open(lidarText, 'r').read()
+    data = data.split('\n')
+    data = data[:len(data)-1]
+
+    g = open(imageTimeStampsTxt, 'r').read()
+    imageTStamps = g.split('\n')
+    imageTStamps.pop(len(imageTStamps)-1)
+
+    lidarInputs = []
+    lidarTimeStamps = []
+    output = []
+
+    for d in data:
+        lidarInput = LidarInput(d)
+        lidarInputs.append(lidarInput)
+        lidarTimeStamps.append(lidarInput.timestamp)
+
+    for im in imageTStamps:
+        # For every image, find the joystick input whose timestamp is closest to the image timestamp
+        closest = min(lidarTimeStamps, key=lambda x: abs(x-long(im)))
+
+        for l in lidarInputs:
+            if l.timestamp == closest:
+                outp = (l.angle, l.distance, l.strength)
+                output.append(outp)   # We want the raw axis value (left-right) for the respective joyInput.
+                break
+
+    output = [np.array(output)]
+    #print(output[0].shape)
+    return output
+# (none, 1, 1)
 class JoyInput:
      def __init__(self, joyText):
-         self.secs = long(joyText[41:52]) # these are the character locations of these values
+         self.secs = long(joyText[42:53]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
          self.axis = float(comm[3]) # left-right axis value
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
 
+class LidarInput:
+    def __init__(self, scanText):
+        sp = scanText.split(' ')
+        self.angle = long(sp[1])/1000.0 # 0 - 360,000
+        self.distance = long(sp[3])
+        self.strength = long(sp[5])
+        self.timestamp = long(sp[7])
+
+#m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+#parseLidarData('/media/ricky/UBUNTU/scandata.txt', '/media/ricky/ZED/timestamp.txt')
 #x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #y, h = getTrainingData('/media/ricky/ZED/images/')
-
+#print(m)
