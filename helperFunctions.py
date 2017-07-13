@@ -73,6 +73,7 @@ def splitList(bigAr):
     return normalArray, testArray
 
 def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
+    # GIVEs  ARRAY OF JOYSTICK VALUES
     joyStickTimeStamps = [] # Raw output from ROS
     imageTimeStamps = [] # Raw output from imageTimeStamps
     joysticks = []  # Array for the Joystick Objects
@@ -108,10 +109,11 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
                 break
 
     output = output[1:] # For prediction purposes, we need to take the joystick val before the image
-    #trainY, testY = splitImage(output)
     return output
 
 def parseLidarData(lidarText, imageTimeStampsTxt):
+    # Outputs the lidar values for every image
+    
     data = open(lidarText, 'r').read()
     data = data.split('\n')
     data = data[:len(data)-1]
@@ -148,7 +150,7 @@ class JoyInput:
          self.secs = long(joyText[42:53]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
-         self.axis = float(comm[3]) # left-right axis value
+         self.axis = float(comm[2]) # left-right axis value
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
 
 class LidarInput:
