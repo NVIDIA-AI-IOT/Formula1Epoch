@@ -1,11 +1,13 @@
 from PIL import Image
 import numpy as np
 
-im = Image.open('/home/ricky/Floors/h1-1.png')
+im = Image.open('/home/ricky/Floors/final.png')
 im = im.convert('L') # make the image greyscale
-bw = im.point(lambda x: 0 if x<128 else 255, '1') # make every pixel either black or white
+bw = im.point(lambda x: 0 if x<240 else 255, '1') # make every pixel either black or white
 
 bw.show()
+bw.save("/home/ricky/Floors/edit.png")
+
 im2 = im.load()
 coordinates = [] # positions of all of the pixels on the BW image
 

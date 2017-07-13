@@ -13,7 +13,7 @@ from threading import Thread
 from rosservice import ROSServiceException
 from multiprocessing.pool import ThreadPool
 import numpy as np
-from threadTest import ThreadingExample
+from threadTest import CustomThread
 
 class JoyTeleopException(Exception):
     pass
@@ -36,7 +36,7 @@ class JoyTeleop:
 
     def __init__(self):
 
-	self.thread = ThreadingExample()
+	self.thread = CustomThread()
 
         if not rospy.has_param("teleop"):
             rospy.logfatal("no configuration was found, taking node down")

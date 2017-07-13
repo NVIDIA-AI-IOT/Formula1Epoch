@@ -4,13 +4,11 @@ import signal
 import sys
 from inference import infer
 
-myGlobalVariable = 0
-
 def signal_handler(signal, frame):
 	print ("Exit")
 	sys.exit(0)
 
-class ThreadingExample(object):
+class CustomThread(object):
     """ Threading example class
     The run() method will be started and it will run in the background
     until the application exits.
@@ -26,7 +24,7 @@ class ThreadingExample(object):
 
         thread = threading.Thread(target=self.run, args=())
         thread.daemon = True
-	thread.setDaemon(True)                            # Daemonize thread
+		thread.setDaemon(True)                            # Daemonize thread
         thread.start()                                  # Start the execution
 
     def returnInference():
@@ -38,18 +36,6 @@ class ThreadingExample(object):
             # Do something
             print('Updating...')
             self.globalVar = infer()
-            #print("myGlobal: " + str(myGlobalVariable))
-            #time.sleep(self.interval)
 
     def getVar(self):
 	return self.globalVar
-
-#example.run()
-
-#while(True):
-#    time.sleep(0.5)
-#    print("My Global Val: " + str(example.globalVar))
-# time.sleep(3)
-# #print('Checkpoint')
-# time.sleep(2)
-# #print('Bye')
