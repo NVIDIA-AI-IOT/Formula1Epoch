@@ -4,54 +4,41 @@ import numpy as np
 #from matplotlib.pyplot import imshow
 from keras.models import Model, load_model, Sequential
 from keras.optimizers import Adam
-from keras.layers import Input,Convolution2D, Convolution1D, MaxPooling2D, Activation, Dropout, Flatten, Dense
+from keras.layers import Input, MaxPooling1D, Convolution2D, MaxPooling2D, Convolution1D, Activation, Dropout, Flatten, Dense
 import cv2
 import helperFunctions
 from keras.utils import plot_model
-from keras import regularizers
-from keras.callbacks import CSVLogger
-csv = CSVLogger('SteerNetSimple.csv', separator='\n', append=True)
 
 def model():
     #Model with 3 hidden layers
-    #Input takes in image
-    lid = Input(shape = (1, 167), name = 'lid')
-    x = Convolution1D(8, 2)(lid)
+    #Input takes    img = Input(shape = (167, 54), name = 'img')
+    #Convolution/Pooling Layer 1
+    lid = Input(shape = (39, 2), name = 'lid')
+
+    '''x = Convolution1D(2, 2)(lid)
     x = Activation('relu')(x)
     x = MaxPooling1D(pool_size=(2))(x)
 
-    x = Convolution1D(16, 2)(lid)
+    x = Convolution1D(4, 2)(x)
     x = Activation('relu')(x)
     x = MaxPooling1D(pool_size=(2))(x)
 
-    x = Convolution1D(32, 2)(lid)
+    x = Convolution1D(4, 2)(x)
     x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
+    x = MaxPooling1D(pool_size=(2))(x)'''
 
-    x = Convolution1D(64, 2)(lid)
+    merged = Flatten()(lid)
+
+    x = Dense(30)(merged)
     x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
+    x = Dropout(.5)(x)
 
-    x = Convolution1D(128, 2)(lid)
+    x = Dense(35)(x)
     x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
+    x = Dropout(.3)(x)
 
-    x = Convolution1D(256, 2)(lid)
-    x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
-
-    x = Convolution1D(512, 2)(lid)
-    x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
-
-    x = Convolution1D(1024, 2)(lid)
-    x = Activation('relu')(x)
-    x = MaxPooling1D(pool_size=(2))(x)
-
-    merged = Flatten()(x)
-
-    x = Dense(128)(merged)
-    x = Activation('linear')(x)
+    x = Dense(40)(x)
+    x = Activation('tanh')(x)
     x = Dropout(.3)(x)
 
     jstk = Dense(1, name='jstk')(x)
@@ -61,16 +48,15 @@ def model():
     print(net.summary())
     return net
 
-
-def trainModel(model, lidarIn, jstkOut):
+def trainModel(model, imgIn, jstkOut):
     #Trains predefined model with verbose logging, input image data and output steering data
-    csv = CSVLogger('SteerNetL2SGD.csv', separator='\n', append=True)
-    model.fit(x=lidarIn, y=jstkOut, batch_size=32, epochs=250, verbose=2, callbacks=[csv], validation_split=0.2, shuffle=True, initial_epoch=0)
-    modelName = 'lidarNet'
+    print(jstkOut)
+    model.fit(x=imgIn, y=jstkOut, batch_size=32, epochs=160, verbose=2, callbacks=None, validation_split=0.2, shuffle=True, initial_epoch=0)
+    modelName = raw_input("Please enter the trained models filename")
     modelPng = modelName + ".png"
     modelName = modelName + ".h5"
     #Plots the trained model
-    #plot_model(steerNet, to_file=modelPng)
+    #plot_model(modelName, to_file=modelPng)
     model.save(modelName)
     print("Saved as %s" %(modelName) )
     return model
@@ -81,12 +67,12 @@ def testModel(model, testX, testY):
     print("\nAccuracy: " + model.metrics_name[1], scores[1]*100)
 
 def main():
-    #Main Function, starts with path inputs
-    #imagePath = raw_input("Please enter the filepath to your images folder")
-    #labelPath = raw_input("Please enter the filepath to your labels folder")
+    # #Main Function, starts with path inputs
+    # imagePath = raw_input("Please enter the filepath to your images folder")
+    # labelPath = raw_input("Please enter the filepath to your labels folder")
     #Uses helper functions to get array of images and outputs
-    lidarAr = helperFunctions.parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
-    jstkAr = helperFunctions.mapImageToJoy('/media/ricky/ZED/data/joydata.txt', '/media/ricky/ZED/data/timestamp.txt')
+    lidarAr = helperFunctions.parseLidarData('/media/ricky/UBUNTU/data/scandata.txt', '/media/ricky/UBUNTU/data/timestamp.txt')
+    jstkAr = helperFunctions.mapImageToJoy('/media/ricky/UBUNTU/data/joydata.txt', '/media/ricky/UBUNTU/data/timestamp.txt')
 
     print("JoyLength: " + str(len(jstkAr)))
     print("LidarLength: " + str(len(lidarAr)))
@@ -95,5 +81,6 @@ def main():
     steerModel = model()
     #Trains model with the function
     trModel = trainModel(steerModel, lidarAr, jstkAr)
+    #testModel(trModel, testX, testY)
 
 main()

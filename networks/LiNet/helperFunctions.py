@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import glob
 import os
+import sys
 
 #All standalone helper functions can be defined here
 def getTrainingData(p):
@@ -111,14 +112,31 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
     output = output[1:] # For prediction purposes, we need to take the joystick val before the image
     return output
 
-def sequenceTo2DArr(seq):
-    output = [[]]
-    for s in seq:
-        output[len(output)-1].append([s.angle, s.distance, s.strength])
-        output.append([])
+def sequenceTo2DArr(seq, medianSampleLength):
+    # output = [[]]
+    distance = []
 
-    output = output[:len(output)-1]
-    return output
+    out = []
+    # want to return an array of distances, corresponding with angles
+    seqLen = len(seq)
+    # print("Seq len: " + str(len(seq)))
+    #print("medianSampleLength: " + str(medianSampleLength))
+
+    for m in range(medianSampleLength):
+        if m < seqLen:
+            out.append([seq[m].distance, int(seq[m].angle)])
+            # print(out)
+            # raw_input()
+        else:
+            out.append([sys.maxint, sys.maxint])
+
+    # print(out)
+    # print("Outlen: " + str(np.array(out).shape))
+    # raw_input()
+    # print("OUT: ")
+    # print(out)
+    # print("\n")
+    return out
 
 def formatRawLidar(lidarText):
     data = open(lidarText, 'r').read()
@@ -131,17 +149,25 @@ def formatRawLidar(lidarText):
     for d in data:
         lidars.append(LidarInput(d))
 
-    for l in range(len(lidars)-1):
+    #print(lidars)
+
+    for l in range(len(lidars)-1): # get sequences of lidar (360 degrees)
         output[len(output)-1].append(lidars[l])
 
         if lidars[l+1].angle < lidars[l].angle:
             output.append([])
 
+    #print output
     return output # [[], [5.6, 6.3], []],
 
 def parseLidarData(lidarText, imageTimeStampsTxt):
     lidarArr = formatRawLidar(lidarText)
-    #print(lidarArr)
+
+    sampleLengths = []
+    for g in lidarArr:
+        sampleLengths.append(len(g))
+
+    medianSampleLength = int(np.round(np.median(sampleLengths)))
 
     g = open(imageTimeStampsTxt, 'r').read()
     imageTStamps = g.split('\n')
@@ -152,8 +178,8 @@ def parseLidarData(lidarText, imageTimeStampsTxt):
 
     lidarTimeStamps = [[]]
     output = [[]]
-
     lastLidar = []
+
     for l in lidarArr:
         lastLidar.append(l[len(l)-1].timestamp)
 
@@ -161,108 +187,34 @@ def parseLidarData(lidarText, imageTimeStampsTxt):
     chosenOne = 0
 
     for imIndex in range(len(imageTStamps)-1):
-        # print(imIndex)
-        # for l in lidarArr:
-        #print(lidarArr[imIndex])
-        closest = min(lastLidar, key=lambda x: abs(long(x) - long(imageTStamps[imIndex])))
-    #    print("Closest timestamp: " + str(closest))
 
-        # for l in lidarArr:
-        #
-        # lastLidarTimeStamp = lidarArr[imIndex][len(lidarArr[imIndex])-1].timestamp
-        # #print("Matchy: " + str(lastLidarTimeStamp))
-        # #print(lastLidarTimeStamp)
-        #
-        # if abs(lastLidarTimeStamp - imageTStamps[imIndex]) < smallest:
-        #     smallest = abs(lastLidarTimeStamp - imageTStamps[imIndex])
-        #     chosenOne =
-        # closest = min(imageTStamps, key=lambda x: abs(long(x)-long(lastLidarTimeStamp)))
-        #
-        # print("Closest timestamp: " + str(closest))
-        #
+        closest = min(lastLidar, key=lambda x: abs(long(x) - long(imageTStamps[imIndex])))
+
         for l in lidarArr:
-        #     #print(abs((l[len(l)-1]).timestamp - long(closest)))
              if long(l[len(l)-1].timestamp) == long(closest):
-                 output.append(sequenceTo2DArr(l))
-                #  print("YEAH, BABYYYY!!!!")
+                 newArr = sequenceTo2DArr(l, medianSampleLength)
+                 #raw_input()
+                 output.append(newArr)
+                #  output.append([])
+                #  output.append(sequenceTo2DArr(l, medianSampleLength))
                  break
 
+    # NEED (360, 2) SHAPE!!!!
     #output = output[:len(output)-1]
     output = output[1:]
-    output = np.array([output])
+    #print("SecodaryOutLen: " + str(len(output)))
+    #output.append([])
+    output = np.array(output)
+    # output = output.swapaxes(0, 1).swapaxes(1,2)
 
-    print("Shape: " + str(output.shape))
+    #print("Shape: " + str(output.shape))
+    # print(output)
+    # print("\n\n\n\n")
+    # print(output[0])
+    # print("\n\n\n\n")
+    # print(output[0][0])
     return output
 
-
-            #print(closest)
-    # for lidar in lidarArr:
-    #     closest = min(imageTStamps, key=lambda x: abs(long(x)-long(lidar[len(lidar)-1].timestamp)))
-    #     print("closest: " + str(closest))
-#
-#     for l in range(len(lidarArr)-1):
-#         for g in lidarArr[l]:
-#             #print(g)
-#             # print(lidarTimeStamps[len(lidarTimeStamps)-1])
-#             lidarTimeStamps[l].append(g[1])
-#         lidarTimeStamps.append([])
-#
-#     lidarTimeStamps = lidarTimeStamps[:len(lidarTimeStamps)-1]
-#     #print(lidarTimeStamps)
-#
-# #    print(lidarTimeStamps)
-#     for im in imageTStamps:
-#         for l in lidarTimeStamps:
-#             closest = min(l, key=lambda x: abs(x-long(im)))
-#             print("closest: " + str(closest))
-#             break
-#     return 0
-
-# def parseLidarData(lidarText, imageTimeStampsTxt):
-#     # Outputs the lidar values for every image
-#
-#     data = open(lidarText, 'r').read()
-#     data = data.split('\n')
-#     data = data[:len(data)-1]
-#
-#     g = open(imageTimeStampsTxt, 'r').read()
-#     imageTStamps = g.split('\n')
-#     imageTStamps.pop(len(imageTStamps)-1)
-#
-#     lidarInputs = []
-#     lidarTimeStamps = []
-#     output = []
-#     output.append([])
-#     output.append([])
-#     output.append([])
-#     #print(output)
-#
-#     for d in data:
-#         lidarInput = LidarInput(d)
-#         lidarInputs.append(lidarInput)
-#         lidarTimeStamps.append(lidarInput.timestamp)
-#
-#     for im in imageTStamps:
-#         # For every image, find the joystick input whose timestamp is closest to the image timestamp
-#         closest = min(lidarTimeStamps, key=lambda x: abs(x-long(im)))
-#
-#         for l in lidarInputs:
-#             if l.timestamp == closest:
-#                 outp = [l.angle, l.distance, l.strength]
-#                 #print(outp)
-#                 output[0].append(l.angle)   # We want the angle, distance, and strength
-#                 output[1].append(l.distance)
-#                 output[2].append(l.strength)
-#                 break
-#
-#     output[0].pop(len(output[0]) - 1)
-#     output[1].pop(len(output[1]) - 1)
-#     output[2].pop(len(output[2]) - 1)
-#
-#     output = np.array(output)
-#     print("Shape: " + str(output.shape))
-#     return output
-# (none, 1, 1)
 class JoyInput:
      def __init__(self, joyText):
          self.secs = long(joyText[42:53]) # these are the character locations of these values
@@ -282,7 +234,13 @@ class LidarInput:
 # #m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
 #ayy = formatRawLidar('/media/ricky/ZED/data/scandata.txt')
-b = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
+#b = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
 # #x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 # #y, h = getTrainingData('/media/ricky/ZED/images/')
-print(b[0])
+# print(b)
+# print("\n")
+# print(b[0])
+# print("\n")
+# print(b[0][0])
+# print("\n")
+#print(b[0][0][0])
