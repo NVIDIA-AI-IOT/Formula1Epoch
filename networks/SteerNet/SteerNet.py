@@ -4,7 +4,7 @@ import numpy as np
 #from matplotlib.pyplot import imshow
 from keras.models import Model, load_model, Sequential
 from keras.optimizers import Adam
-from keras.layers import Input, Convolution2D, MaxPooling2D, Activation, Dropout, Flatten, Dense
+from keras.layers import Input, Convolution2D, MaxPooling1D, MaxPooling2D, Activation, Dropout, Flatten, Dense
 import cv2
 import helperFunctions
 from keras.utils import plot_model
@@ -58,11 +58,10 @@ def testModel(model, testX, testY):
 
 def main():
     #Main Function, starts with path inputs
-    imagePath = raw_input("Please enter the filepath to your images folder")
-    labelPath = raw_input("Please enter the filepath to your labels folder")
     #Uses helper functions to get array of images and outputs
-    imgAr, testX = helperFunctions.getTrainingData('/media/ricky/ZED/images/')
-    jstkAr, testY = helperFunctions.mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+    imgAr, testX = helperFunctions.getTrainingData('/media/ricky/ZED/data/images/')
+    jstkAr, testY = helperFunctions.mapImageToJoy('/media/ricky/ZED/data/joydata.txt', '/media/ricky/ZED/data/timestamp.txt')
+
     #Runs model function to initialize model
     steerModel = model()
     #Trains model with the function

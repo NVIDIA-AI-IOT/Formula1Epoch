@@ -113,7 +113,7 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
 
 def parseLidarData(lidarText, imageTimeStampsTxt):
     # Outputs the lidar values for every image
-    
+
     data = open(lidarText, 'r').read()
     data = data.split('\n')
     data = data[:len(data)-1]
@@ -138,7 +138,7 @@ def parseLidarData(lidarText, imageTimeStampsTxt):
         for l in lidarInputs:
             if l.timestamp == closest:
                 outp = (l.angle, l.distance, l.strength)
-                output.append(outp)   # We want the raw axis value (left-right) for the respective joyInput.
+                output.append(outp)   # We want the angle, distance, and strength
                 break
 
     output = [np.array(output)]
@@ -162,7 +162,7 @@ class LidarInput:
         self.timestamp = long(sp[7])
 
 #m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-#parseLidarData('/media/ricky/UBUNTU/scandata.txt', '/media/ricky/ZED/timestamp.txt')
+d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
 #x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #y, h = getTrainingData('/media/ricky/ZED/images/')
-#print(m)
+print(d)
