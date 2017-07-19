@@ -194,18 +194,17 @@ def model():
 
     net = Model(input=[lid], output=[jstk])
 
-    sgd = optimizers.SGD(lr=0.000025, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
-    adam = optimizers.Adam(lr=0.000025, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-
-    net.compile(optimizer=adam, loss='mean_squared_error', metrics=['accuracy'])
+    adam = optimizers.Adam(lr=0.00000025, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    net.compile(optimizer=adam, loss='binary_crossentropy', metrics=['accuracy'])
     print(net.summary())
     return net
 
 def trainModel(model, imgIn, jstkOut):
     #Trains predefined model with verbose logging, input image data and output steering data
     print(jstkOut)
-    history = model.fit(x=imgIn, y=jstkOut, batch_size=32, epochs=500, verbose=2, callbacks=None, validation_split=0.2, shuffle=True, initial_epoch=0)
+    history = model.fit(x=imgIn, y=jstkOut, batch_size=32, epochs=200, verbose=2, callbacks=None, validation_split=0.2, shuffle=True, initial_epoch=0)
     visualizeData(history)
     modelName = raw_input("Please enter the trained models filename")
     modelPng = modelName + ".png"

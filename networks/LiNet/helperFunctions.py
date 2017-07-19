@@ -215,12 +215,48 @@ def parseLidarData(lidarText, imageTimeStampsTxt):
     # print(output[0][0])
     return output
 
+def formatRawLidarForInference(lidarText):
+        data = open(lidarText, 'r').read()
+        data = data.split('\n')
+        data = data[:len(data)-1]
+
+        lidars = []
+
+        for d in data:
+            lidars.append(LidarInput(d))
+
+        found = False
+        lidarsOfInterest = []
+
+
+        reversedLidar = []
+
+        for l in reversed(lidars):
+            reversedLidar.append(l)
+
+        reversedLidar = reversedLidar[1:]
+        
+        for l in range(len(reversedLidar)-1):
+
+            if reversedLidar[l+1].angle > reversedLidar[l].angle:
+                l += 1
+                while(reversedLidar[l+1].angle < reversedLidar[l].angle):
+                    lidarsOfInterest.append(reversedLidar[l])
+                    break
+
+        return lidarsOfInterest
+            # if lidars[l+1].angle < lidars[l].angle:
+            #     if found == False:
+            #         found = True
+            #     else:
+            #         lidarsOfInterest.append(lidars[l])
+
 class JoyInput:
      def __init__(self, joyText):
          self.secs = long(joyText[42:53]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
-         self.axis = float(comm[2]) # left-right axis value
+         self.axis = float(comm[3]) # left-right axis value
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
 
 class LidarInput:
@@ -231,6 +267,8 @@ class LidarInput:
         self.strength = long(sp[5])
         self.timestamp = long(sp[7])
 
+j = formatRawLidarForInference('/media/ricky/UBUNTU/data/scandata.txt')
+print(j)
 # #m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
 #ayy = formatRawLidar('/media/ricky/ZED/data/scandata.txt')
