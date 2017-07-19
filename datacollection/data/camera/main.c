@@ -31,6 +31,7 @@ struct timeval tv;
 static volatile int exitHandle = 1;
 
 void intHandler(int exitSignal) {
+	printf("Exiting...\n");
     exitHandle = 0;
 }
 
@@ -130,7 +131,7 @@ int main(int argc, char *argv[]) {
     // Set up for image file name
     int jpegfile;
 
-    char* imagepath = "images/";
+    char* imagepath = "/media/ubuntu/A802-B19C/images/";
     char* imagejpeg = ".jpeg";
     char* imagenum;
     char* fullimagepath;
@@ -158,7 +159,7 @@ int main(int argc, char *argv[]) {
     
     signal(SIGINT, intHandler);
 
-    while (exitHandle) { // no longer stupid
+    while (exitHandle) { // Exit when needed
        if(ioctl(fd, VIDIOC_QBUF, &bufferstreaminfo) < 0) {
 	    perror("VIDIOC_QBUF");
             exit(1);
@@ -173,48 +174,52 @@ int main(int argc, char *argv[]) {
 //	    printf("Buffer waited\n");
         }
 
-  	// Getting timestamp in milliseconds and printing it
+  	    // Getting timestamp in milliseconds and printing it
         gettimeofday(&tv, NULL);
-	millisec = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
+	    millisec = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
 
-	// Getting time to compensate frames per second
-	end_t = millisec;
-	total_t = end_t - start_t;
-	printf("Total time: %llu \n", total_t);
+	    // Getting time to compensate frames per second
+	    end_t = millisec;
+	    total_t = end_t - start_t;
+	    printf("Total time: %llu \n", total_t);
 
-	// Get value for the stop camera button
-	capturebuttonfile = fopen("/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/captureButton.txt", "r");
-	fscanf(capturebuttonfile, "%s", capturebuttonchar);
-	sscanf(capturebuttonchar, "%d", &capturebutton);
+     	// Get value for the stop camera button
+	    capturebuttonfile = fopen("/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/captureButton.txt", "r");
+        printf("Opened capturebuttonfile\n");
+	    fscanf(capturebuttonfile, "%s", capturebuttonchar);
+        printf("Reading capturebuttonfile string\n");
+	    sscanf(capturebuttonchar, "%d", &capturebutton);
+		printf("Converted capturebuttonfile string to int\n");
+        fclose(capturebuttonfile);
 
-	// Get 3 frames every second
- 	if (total_t > (unsigned long long)(1.0 / 3.0 * 1000) && capturebutton == 1) {
-	    start_t = millisec;
-	    // Print the image timestamp to console
-  	    printf("Timestamp: %llu \n", millisec);
-	    // Write the timestamp to "timestamp.txt"
+	    // Get 3 frames every second
+ 	    if (total_t > (unsigned long long)(1.0 / 1.0 * 1000) && capturebutton == 1) {
+	        start_t = millisec;
+	        // Print the image timestamp to console
+  	        printf("Timestamp: %llu \n", millisec);
+	        // Write the timestamp to "timestamp.txt"
             timestampnum = malloc(16);
             snprintf(timestampnum, 16, "%llu\n", millisec);
-	    timestampfile = fopen("timestamp.txt", "a");
-	    fprintf(timestampfile, "%llu\n", millisec);
-	    fclose(timestampfile);
+	        timestampfile = fopen("timestamp.txt", "a");
+	        fprintf(timestampfile, "%llu\n", millisec);
+	        fclose(timestampfile);
 
-  	    // getting image number from file
-	    countfile = fopen("count.txt", "r");
+  	        // getting image number from file
+	        countfile = fopen("count.txt", "r");
             fscanf(countfile, "%s", scount);
-	    sscanf(scount, "%d", &count);
-	    fclose(countfile);
+	        sscanf(scount, "%d", &count);
+	        fclose(countfile);
 
-	    // setting number for next image
-	    countfile = fopen("count.txt", "w");
-	    fprintf(countfile, "%d", count + 1);
-	    fclose(countfile);
+	        // setting number for next image
+	        countfile = fopen("count.txt", "w");
+	        fprintf(countfile, "%d", count + 1);
+	        fclose(countfile);
 
-	    // getting full image path from coverting integer to char* and combine them, maybe change this to be less stupid?
+	        // getting full image path from coverting integer to char* and combine them, maybe change this to be less stupid?
             imagenum = malloc(16);
             snprintf(imagenum, 16, "%d", count);
          
-	    fullimagepath = malloc(strlen(imagepath) + strlen(imagenum) + strlen(imagejpeg));
+	        fullimagepath = malloc(strlen(imagepath) + strlen(imagenum) + strlen(imagejpeg));
             strcpy(fullimagepath, imagepath);
             strcat(fullimagepath, imagenum);
             strcat(fullimagepath, imagejpeg);
@@ -231,26 +236,27 @@ int main(int argc, char *argv[]) {
             write(jpegfile, buffer_start, bufferstreaminfo.length);
             close(jpegfile);
             free(fullimagepath);
-	}
+	    }
 
-	if (capturebutton == 1) {
-	    printf("Collecting Data\n");
-	}	
+	    if (capturebutton == 1) {
+	        printf("Collecting Data\n");
+	    }
 
-	lastseconds = tv.tv_sec;
-	//printf("Seconds: %llu \n", lastseconds);
+     	lastseconds = tv.tv_sec;
+	    printf("Seconds: %llu \n", lastseconds);
 
      }
 
      // Deactivate streaming
      if(ioctl(fd, VIDIOC_STREAMOFF, &type) < 0) {
- 	 perror("VIDIOC_STREAMOFF");
-	 exit(1);
+ 	 	perror("VIDIOC_STREAMOFF");
+		exit(1);
+     } else {
+        printf("Deactivated video stream\n");	 
      }
-     // Writing as jpeg
-     close(fd);
 
+     close(fd);
+     printf("Camera device closed\n");
         
     return EXIT_SUCCESS;
 }
-

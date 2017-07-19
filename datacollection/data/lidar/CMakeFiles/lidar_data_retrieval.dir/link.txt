@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11 -Wall -Wextra -pedantic   CMakeFiles/lidar_data_retrieval.dir/main.cpp.o  -o lidar_data_retrieval -rdynamic /usr/local/lib/libsweep.so -lpthread -Wl,-rpath,/usr/local/lib 

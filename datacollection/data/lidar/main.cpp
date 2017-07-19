@@ -39,6 +39,8 @@ int main(int argc, char* argv[]) try {
     cout << "Constructing sweep device..." << endl;
     sweep::sweep device{argv[1]};
 
+    device.set_sample_rate(1000);
+
     cout << "Motor Speed Setting: " << device.get_motor_speed() << " Hz" << endl;
     cout << "Sample Rate Setting: " << device.get_sample_rate() << " Hz" << endl;
 
