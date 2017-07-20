@@ -1,0 +1,3 @@
+/home/ubuntu/Formula1Epoch/datacollection/data/lidar/CMakeFiles/edit_cache.dir
+/home/ubuntu/Formula1Epoch/datacollection/data/lidar/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/Formula1Epoch/datacollection/data/lidar/CMakeFiles/lidar_data_retrieval.dir

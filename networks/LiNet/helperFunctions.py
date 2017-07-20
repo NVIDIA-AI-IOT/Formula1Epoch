@@ -264,7 +264,7 @@ class JoyInput:
          self.secs = long(joyText[42:53]) # these are the character locations of these values
          self.nsecs = long(joyText[64:73])
          comm = joyText.split(',')
-         self.axis = float(comm[3]) # left-right axis value
+         self.axis = float(comm[2]) # left-right axis value
          self.timeStamp = long(self.secs*1000 + self.nsecs/1000000) # milliseconds
 
 class LidarInput:
