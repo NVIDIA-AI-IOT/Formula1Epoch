@@ -1,3 +1,2 @@
-[![title.png](https://s4.postimg.org/v4vrkyj31/title.png)](https://postimg.org/image/hb7evwqhl/)
-
+[![title.png](https://s22.postimg.org/w9sb0vysh/title.png)](https://postimg.org/image/bpnh2ej19/)
 Repository for the Formula 1 Epoch Team.
