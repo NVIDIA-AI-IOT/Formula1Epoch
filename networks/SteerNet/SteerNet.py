@@ -1,10 +1,4 @@
 #import tensorflow as tf
-import sys
-from inspect import getsourcefile
-import os.path
-import sys
-sys.path.append('../..')
-
 import numpy as np
 #import matplotlib
 #from matplotlib.pyplot import imshow
@@ -12,9 +6,8 @@ from keras.models import Model, load_model, Sequential
 from keras.optimizers import Adam
 from keras.layers import Input, Convolution2D, MaxPooling1D, MaxPooling2D, Activation, Dropout, Flatten, Dense
 import cv2
-import helperFunctions as hf
+import helperFunctions
 from keras.utils import plot_model
-
 
 def model():
     #Model with 3 hidden layers
@@ -66,8 +59,8 @@ def testModel(model, testX, testY):
 def main():
     #Main Function, starts with path inputs
     #Uses helper functions to get array of images and outputs
-    imgAr = hf.getTrainingData('/media/ricky/ZED/data/images/')
-    jstkAr = hf.mapImageToJoy('/media/ricky/ZED/data/joydata.txt', '/media/ricky/ZED/data/timestamp.txt')
+    imgAr, testX = helperFunctions.getTrainingData('/media/ricky/ZED/data/images/')
+    jstkAr, testY = helperFunctions.mapImageToJoy('/media/ricky/ZED/data/joydata.txt', '/media/ricky/ZED/data/timestamp.txt')
 
     #Runs model function to initialize model
     steerModel = model()
