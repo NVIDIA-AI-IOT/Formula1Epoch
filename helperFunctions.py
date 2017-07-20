@@ -2,6 +2,8 @@ from PIL import Image
 import numpy as np
 import glob
 import os
+# import sys
+# sys.path.append('.')
 
 #All standalone helper functions can be defined here
 def getTrainingData(p):
@@ -111,40 +113,153 @@ def mapImageToJoy(joyDataTxt, imageTimeStampTxt):
     output = output[1:] # For prediction purposes, we need to take the joystick val before the image
     return output
 
-def parseLidarData(lidarText, imageTimeStampsTxt):
-    # Outputs the lidar values for every image
+def sequenceTo2DArr(seq, medianSampleLength):
+    # output = [[]]
+    distance = []
 
+    out = []
+    # want to return an array of distances, corresponding with angles
+    seqLen = len(seq)
+    # print("Seq len: " + str(len(seq)))
+    #print("medianSampleLength: " + str(medianSampleLength))
+
+    for m in range(medianSampleLength):
+        if m < seqLen:
+            out.append([seq[m].distance, (seq[m].angle)])
+            # print(out)
+            # raw_input()
+        else:
+            out.append([sys.maxint, sys.maxint])
+
+    # print(out)
+    # print("Outlen: " + str(np.array(out).shape))
+    # raw_input()
+    # print("OUT: ")
+    # print(out)
+    # print("\n")
+    return out
+
+def formatRawLidar(lidarText):
     data = open(lidarText, 'r').read()
     data = data.split('\n')
     data = data[:len(data)-1]
+
+    lidars = []
+    output = [[]]
+
+    for d in data:
+        lidars.append(LidarInput(d))
+
+    #print(lidars)
+
+    for l in range(len(lidars)-1): # get sequences of lidar (360 degrees)
+        output[len(output)-1].append(lidars[l])
+
+        if lidars[l+1].angle < lidars[l].angle:
+            output.append([])
+
+    #print output
+    return output # [[], [5.6, 6.3], []],
+
+def parseLidarData(lidarText, imageTimeStampsTxt):
+    lidarArr = formatRawLidar(lidarText)
+
+    sampleLengths = []
+    for g in lidarArr:
+        sampleLengths.append(len(g))
+
+    medianSampleLength = int(np.round(np.median(sampleLengths)))
 
     g = open(imageTimeStampsTxt, 'r').read()
     imageTStamps = g.split('\n')
     imageTStamps.pop(len(imageTStamps)-1)
 
-    lidarInputs = []
-    lidarTimeStamps = []
+    for imagT in imageTStamps:
+        imagT = long(imagT)
+
+    lidarTimeStamps = [[]]
+    output = [[]]
+    lastLidar = []
+
+    for l in lidarArr:
+        lastLidar.append(l[len(l)-1].timestamp)
+
+    smallest = 45849584958
+    chosenOne = 0
+
+    for imIndex in range(len(imageTStamps)-1):
+
+        closest = min(lastLidar, key=lambda x: abs(long(x) - long(imageTStamps[imIndex])))
+
+        for l in lidarArr:
+             if long(l[len(l)-1].timestamp) == long(closest):
+                 newArr = sequenceTo2DArr(l, medianSampleLength)
+                 #raw_input()
+                 output.append(newArr)
+                #  output.append([])
+                #  output.append(sequenceTo2DArr(l, medianSampleLength))
+                 break
+
+    # NEED (360, 2) SHAPE!!!!
+    #output = output[:len(output)-1]
+    output = output[1:]
+    #print("SecodaryOutLen: " + str(len(output)))
+    #output.append([])
+    output = np.array(output)
+
+    return output
+
+def sampleArrayForInference(sampleArr):
+    # Output: [(distance, angle), (distance, angle)]
     output = []
 
-    for d in data:
-        lidarInput = LidarInput(d)
-        lidarInputs.append(lidarInput)
-        lidarTimeStamps.append(lidarInput.timestamp)
+    for s in sampleArr:
+        output.append((s.distance, s.angle))
 
-    for im in imageTStamps:
-        # For every image, find the joystick input whose timestamp is closest to the image timestamp
-        closest = min(lidarTimeStamps, key=lambda x: abs(x-long(im)))
-
-        for l in lidarInputs:
-            if l.timestamp == closest:
-                outp = (l.angle, l.distance, l.strength)
-                output.append(outp)   # We want the angle, distance, and strength
-                break
-
-    output = [np.array(output)]
-    #print(output[0].shape)
     return output
-# (none, 1, 1)
+
+def formatRawLidarForInference(lidarText):
+        data = open(lidarText, 'r').read()
+        data = data.split('\n')
+        data = data[:len(data)-1]
+
+        lidars = []
+
+        for d in data:
+            lidars.append(LidarInput(d))
+
+        found = False
+        lidarsOfInterest = []
+
+        reversedLidar = []
+
+        for l in reversed(lidars):
+            reversedLidar.append(l)
+
+        reversedLidar = reversedLidar[1:]
+
+        for l in range(len(reversedLidar)-1):
+            if reversedLidar[l+1].angle > reversedLidar[l].angle:
+                l += 1
+                while(reversedLidar[l+1].angle < reversedLidar[l].angle):
+                    lidarsOfInterest.append(reversedLidar[l])
+                    break
+
+        output = []
+
+        for m in range(39):
+            if m < 39:
+                output.append([lidarsOfInterest[m].distance, (lidarsOfInterest[m].angle)])
+            else:
+                output.append([lidarsOfInterest.maxint, lidarsOfInterest.maxint])
+        # print(output)
+        return output
+            # if lidars[l+1].angle < lidars[l].angle:
+            #     if found == False:
+            #         found = True
+            #     else:
+            #         lidarsOfInterest.append(lidars[l])
+
 class JoyInput:
      def __init__(self, joyText):
          self.secs = long(joyText[42:53]) # these are the character locations of these values
@@ -161,8 +276,18 @@ class LidarInput:
         self.strength = long(sp[5])
         self.timestamp = long(sp[7])
 
-#m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
-#x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
-#y, h = getTrainingData('/media/ricky/ZED/images/')
-print(d)
+# j = formatRawLidarForInference('/media/ricky/UBUNTU/data/scandata.txt')
+# print(j)
+# #m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+#d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
+#ayy = formatRawLidar('/media/ricky/ZED/data/scandata.txt')
+#b = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
+# #x, m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
+# #y, h = getTrainingData('/media/ricky/ZED/images/')
+# print(b)
+# print("\n")
+# print(b[0])
+# print("\n")
+# print(b[0][0])
+# print("\n")
+#print(b[0][0][0])
