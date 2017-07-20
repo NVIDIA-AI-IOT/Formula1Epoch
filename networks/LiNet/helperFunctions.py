@@ -124,7 +124,7 @@ def sequenceTo2DArr(seq, medianSampleLength):
 
     for m in range(medianSampleLength):
         if m < seqLen:
-            out.append([seq[m].distance, int(seq[m].angle)])
+            out.append([seq[m].distance, (seq[m].angle)])
             # print(out)
             # raw_input()
         else:
@@ -205,14 +205,16 @@ def parseLidarData(lidarText, imageTimeStampsTxt):
     #print("SecodaryOutLen: " + str(len(output)))
     #output.append([])
     output = np.array(output)
-    # output = output.swapaxes(0, 1).swapaxes(1,2)
 
-    #print("Shape: " + str(output.shape))
-    # print(output)
-    # print("\n\n\n\n")
-    # print(output[0])
-    # print("\n\n\n\n")
-    # print(output[0][0])
+    return output
+
+def sampleArrayForInference(sampleArr):
+    # Output: [(distance, angle), (distance, angle)]
+    output = []
+
+    for s in sampleArr:
+        output.append((s.distance, s.angle))
+
     return output
 
 def formatRawLidarForInference(lidarText):
@@ -228,23 +230,29 @@ def formatRawLidarForInference(lidarText):
         found = False
         lidarsOfInterest = []
 
-
         reversedLidar = []
 
         for l in reversed(lidars):
             reversedLidar.append(l)
 
         reversedLidar = reversedLidar[1:]
-        
-        for l in range(len(reversedLidar)-1):
 
+        for l in range(len(reversedLidar)-1):
             if reversedLidar[l+1].angle > reversedLidar[l].angle:
                 l += 1
                 while(reversedLidar[l+1].angle < reversedLidar[l].angle):
                     lidarsOfInterest.append(reversedLidar[l])
                     break
 
-        return lidarsOfInterest
+        output = []
+
+        for m in range(39):
+            if m < 39:
+                output.append([lidarsOfInterest[m].distance, (lidarsOfInterest[m].angle)])
+            else:
+                output.append([lidarsOfInterest.maxint, lidarsOfInterest.maxint])
+        # print(output)
+        return output
             # if lidars[l+1].angle < lidars[l].angle:
             #     if found == False:
             #         found = True
@@ -267,8 +275,8 @@ class LidarInput:
         self.strength = long(sp[5])
         self.timestamp = long(sp[7])
 
-j = formatRawLidarForInference('/media/ricky/UBUNTU/data/scandata.txt')
-print(j)
+# j = formatRawLidarForInference('/media/ricky/UBUNTU/data/scandata.txt')
+# print(j)
 # #m = mapImageToJoy('/media/ricky/ZED/joydata.txt', '/media/ricky/ZED/timestamp.txt')
 #d = parseLidarData('/media/ricky/ZED/data/scandata.txt', '/media/ricky/ZED/data/timestamp.txt')
 #ayy = formatRawLidar('/media/ricky/ZED/data/scandata.txt')
