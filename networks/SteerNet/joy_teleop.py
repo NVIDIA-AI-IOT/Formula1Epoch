@@ -13,7 +13,8 @@ from threading import Thread
 from rosservice import ROSServiceException
 from multiprocessing.pool import ThreadPool
 import numpy as np
-from threadTest import CustomThread
+from CustomThread import CustomThread
+#from inference import infer
 
 class JoyTeleopException(Exception):
     pass
@@ -21,9 +22,7 @@ class JoyTeleopException(Exception):
 '''
 Originally from https://github.com/ros-teleop/teleop_tools
 Pulled on April 28, 2017.
-
 Edited by Winter Guerra on April 28, 2017 to allow for default actions.
-
 Edited by the Formula 1 Epoch team in July 2017 to add autonomous functions.
 '''
 
@@ -239,15 +238,16 @@ class JoyTeleop:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
                   val = 0.0
                 else:
-#                    val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+                  #val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
                   if mapping['axis'] == 1:
-                    joy_value = 0.5
+                    joy_value = 1
                   else:
                     print('going to infer')
                     joy_value = self.thread.getVar()
-		    valsf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/vals.txt', 'a')
-		    valsf.write(str(joy_value) + "\n")
-		    valsf.close()
+                    fil = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/joys.txt', 'w')
+                    fil.write(str(joy_value))
+                    fil.close()
+
                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
                 self.set_member(msg, mapping['target'], val)
@@ -321,4 +321,4 @@ if __name__ == "__main__":
     except JoyTeleopException:
         pass
     except rospy.ROSInterruptException:
-        pass
+       pass
