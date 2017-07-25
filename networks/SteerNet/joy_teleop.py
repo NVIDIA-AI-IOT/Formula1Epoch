@@ -13,8 +13,7 @@ from threading import Thread
 from rosservice import ROSServiceException
 from multiprocessing.pool import ThreadPool
 import numpy as np
-from CustomThread import CustomThread
-#from inference import infer
+#from threadTest import CustomThread
 
 class JoyTeleopException(Exception):
     pass
@@ -22,7 +21,9 @@ class JoyTeleopException(Exception):
 '''
 Originally from https://github.com/ros-teleop/teleop_tools
 Pulled on April 28, 2017.
+
 Edited by Winter Guerra on April 28, 2017 to allow for default actions.
+
 Edited by the Formula 1 Epoch team in July 2017 to add autonomous functions.
 '''
 
@@ -35,7 +36,7 @@ class JoyTeleop:
 
     def __init__(self):
 
-	self.thread = CustomThread()
+#	self.thread = CustomThread()
 
         if not rospy.has_param("teleop"):
             rospy.logfatal("no configuration was found, taking node down")
@@ -54,7 +55,6 @@ class JoyTeleop:
 
         teleop_cfg = rospy.get_param("teleop")
 	joy_value = 0; # Fake joy value
-#       start_time = time.time()
 
         for i in teleop_cfg:
             if i in self.command_list:
@@ -225,30 +225,29 @@ class JoyTeleop:
 
         else:
 #           elapsed_time = time.time() - start_time;
-            #cameraf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/captureButton.txt', 'w')
-            #camera_joy = joy_state.axes[5]
-            #if camera_joy <= 0:
-            #   cameraf.write("1")
-            #else:
-	    #   cameraf.write("0")
-	    #   cameraf.close()
+            cameraf = open('/home/nvidia/racecar-ws/src/racecar/racecar/scripts/captureButton.txt', 'w')
+            camera_joy = joy_state.axes[5]
+            if camera_joy <= 0:
+               cameraf.write("0")
+            else:
+	       		cameraf.write("1")
+	       		cameraf.close()
 
             for mapping in cmd['axis_mappings']:
                 if len(joy_state.axes)<=mapping['axis']:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
                   val = 0.0
                 else:
-                  #val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
-                  if mapping['axis'] == 1:
-                    joy_value = 1
-                  else:
-                    print('going to infer')
-                    joy_value = self.thread.getVar()
-                    fil = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/joys.txt', 'w')
-                    fil.write(str(joy_value))
-                    fil.close()
-
-                  val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+                   val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+#                   if mapping['axis'] == 1:
+#                    joy_value = 0.5
+#                  else:
+#                    print('going to infer')
+#                    joy_value = self.thread.getVar()
+#                valsf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/vals.txt', 'a')
+#                valsf.write(str(joy_value) + "\n")
+#                valsf.close()
+#                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
                 self.set_member(msg, mapping['target'], val)
 
@@ -321,4 +320,4 @@ if __name__ == "__main__":
     except JoyTeleopException:
         pass
     except rospy.ROSInterruptException:
-       pass
+        pass

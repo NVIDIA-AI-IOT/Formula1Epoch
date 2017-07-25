@@ -8,11 +8,14 @@ echo "Clearing timestamp.txt..."
 > timestamp.txt
 echo "done."
 echo "Clearing images..."
-cd /media/ubuntu/A802-B19C
+cd ~/Formula1Epoch/datacollection/data/camera
 rm images/*
 echo "done."
 echo "Clearing joydata.txt..."
 > ~/Formula1Epoch/datacollection/data/joydata.txt
+echo "done."
+echo "Clearing lidardata.txt..."
+> ~/Formula1Epoch/datacollection/data/lidar/lidardata.txt
 echo "done."
 echo "Cleared files."
 echo "Starting collection..."
@@ -25,11 +28,14 @@ cd
 echo "Starting joystick collection..."
 xterm -e "rostopic echo /vesc/joy > ~/Formula1Epoch/datacollection/data/joydata.txt" &
 echo "done."
+#echo "Starting lidar collection..."
+#xterm -e "python /home/nvidia/Formula1Epoch/datacollection/data/lidar/collect_lidar.py > /home/nvidia/Formula1Epoch/datacollection/data/lidar/lidardata.txt & echo 'Collecting lidar data...'" &
+#echo "done."
+echo "Start lidar collection now (Type something and press ENTER when done)"
+read
 echo "Starting camera collection..."
 cd ~/Formula1Epoch/datacollection/data/camera
-gcc -o test ~/Formula1Epoch/datacollection/data/camera/main.c
-sleep 10
-./test &
+python video_capture.py
 echo "ALL COLLECTION STARTED" &
 wait
 
