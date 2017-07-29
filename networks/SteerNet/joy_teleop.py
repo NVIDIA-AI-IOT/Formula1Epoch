@@ -13,7 +13,7 @@ from threading import Thread
 from rosservice import ROSServiceException
 from multiprocessing.pool import ThreadPool
 import numpy as np
-from threadTest import CustomThread
+#from threadTest import CustomThread
 
 class JoyTeleopException(Exception):
     pass
@@ -36,7 +36,7 @@ class JoyTeleop:
 
     def __init__(self):
 
-	self.thread = CustomThread()
+#	self.thread = CustomThread()
 
         if not rospy.has_param("teleop"):
             rospy.logfatal("no configuration was found, taking node down")
@@ -238,16 +238,16 @@ class JoyTeleop:
                   rospy.logerr('Joystick has only {} axes (indexed from 0), but #{} was referenced in config.'.format(len(joy_state.axes), mapping['axis']))
                   val = 0.0
                 else:
-                   #val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
-                   if mapping['axis'] == 1:
-                    joy_value = 0.5
-                  else:
-                    print('going to infer')
-                    joy_value = self.thread.getVar()
-                valsf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/vals.txt', 'a')
-                valsf.write(str(joy_value) + "\n")
-                valsf.close()
-                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+                   val = joy_state.axes[mapping['axis']] * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
+#                   if mapping['axis'] == 1:
+#                    joy_value = 0.5
+#                  else:
+#                    print('going to infer')
+#                    joy_value = self.thread.getVar()
+#                valsf = open('/home/ubuntu/racecar-ws/src/racecar/racecar/scripts/vals.txt', 'a')
+#                valsf.write(str(joy_value) + "\n")
+#                valsf.close()
+#                   val = joy_value * mapping.get('scale', 1.0) + mapping.get('offset', 0.0)
 
                 self.set_member(msg, mapping['target'], val)
 
