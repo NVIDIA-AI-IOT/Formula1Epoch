@@ -3,14 +3,15 @@ import time
 import signal
 import sys
 from inference import infer
-from sweeppy import Sweep
+#from sweeppy import Sweep
 
 myGlobalVariable = 0
-dev = '/dev/ttyUSB0'
+#dev = '/dev/ttyUSB0'
 
-def signal_handler(signal, frame):
-	print ("Exit")
-	sys.exit(0)
+def ctrlc_exit(signal, frame):
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, ctrlc_exit)
 
 class CustomThread(object):
 	""" Threading example class
@@ -32,36 +33,37 @@ class CustomThread(object):
 		thread.start()                                  # Start the execution
 
 	def returnInference():
-		return globalVar
+		return self.globalVar
 
 	def run(self):
 		""" Method that runs forever """
-#		with Sweep(dev) as sweep:
-#			sweep.set_sample_rate(1000)
-#			sweep.start_scanning()
-#			for scan in sweep.getscans():
-#				for samples in scan:
-#					scanVar = samples			
 
-		while(True):
+		#self.globalVar = 1
+
+		while (True):
 			print('Updating...')
-#   	        self.globalVar = infer(scanVar)
-				
+			self.globalVar = infer()
+
   	        # Do something
   	        #print("myGlobal: " + str(myGlobalVariable))
    	        #time.sleep(self.interval)
 
 	def getVar(self):
-		return self.globalVar
+		#self.globalVar = infer()
+	#	self.globalVar += 0.1
+		#if (self.globalVar == 1):
+		#	self.globalVar = -1
+		return 0.5 #self.globalVar
 
 
+'''
+example = CustomThread()
 
-#example.run()
-
-#while(True):
-#    time.sleep(0.5)
-#    print("My Global Val: " + str(example.globalVar))
-# time.sleep(3)
-# #print('Checkpoint')
-# time.sleep(2)
-# #print('Bye')
+while(True):
+	time.sleep(0.5)
+	print("My Global Val: " + str(example.globalVar))
+	time.sleep(3)
+	print('Checkpoint')
+	time.sleep(2)
+	print('Bye')
+'''
