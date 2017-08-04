@@ -1,0 +1,11 @@
+jstk.npy filter=lfs diff=lfs merge=lfs -text
+jstkT1.npy filter=lfs diff=lfs merge=lfs -text
+lidar.npy filter=lfs diff=lfs merge=lfs -text
+lidarT1.npy filter=lfs diff=lfs merge=lfs -text
+liout.npy filter=lfs diff=lfs merge=lfs -text
+image.npy filter=lfs diff=lfs merge=lfs -text
+imout.npy filter=lfs diff=lfs merge=lfs -text
+imoutT1.npy filter=lfs diff=lfs merge=lfs -text
+lioutT1.npy filter=lfs diff=lfs merge=lfs -text
+imageT1.npy filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
