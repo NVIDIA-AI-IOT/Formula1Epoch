@@ -1,0 +1,7 @@
+\subsubsection usage Usage
+\verbatim
+<node name="zed_wrapper" pkg="zed_wrapper" type="zed_wrapper">
+  <param name="confidence" type="int" value="80" />
+</node>
+\endverbatim
+

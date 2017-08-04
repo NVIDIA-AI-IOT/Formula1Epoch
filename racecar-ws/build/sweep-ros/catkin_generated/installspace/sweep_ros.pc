@@ -1,0 +1,8 @@
+prefix=/home/nvidia/racecar-ws/install
+
+Name: sweep_ros
+Description: Description of sweep_ros
+Version: 0.2.0
+Cflags: 
+Libs: -L/home/nvidia/racecar-ws/install/lib 
+Requires: sensor_msgs

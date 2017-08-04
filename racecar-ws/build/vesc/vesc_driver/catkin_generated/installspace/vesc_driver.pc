@@ -1,0 +1,8 @@
+prefix=/home/nvidia/racecar-ws/install
+
+Name: vesc_driver
+Description: Description of vesc_driver
+Version: 0.0.1
+Cflags: -I/home/nvidia/racecar-ws/install/include
+Libs: -L/home/nvidia/racecar-ws/install/lib 
+Requires: nodelet pluginlib roscpp std_msgs vesc_msgs serial

@@ -1,0 +1,8 @@
+prefix=/home/nvidia/racecar-ws/install
+
+Name: vesc_ackermann
+Description: Description of vesc_ackermann
+Version: 0.0.1
+Cflags: -I/home/nvidia/racecar-ws/install/include
+Libs: -L/home/nvidia/racecar-ws/install/lib 
+Requires: nodelet pluginlib roscpp nav_msgs std_msgs geometry_msgs tf ackermann_msgs vesc_msgs

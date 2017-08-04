@@ -1,0 +1,10 @@
+#!/bin/bash
+echo "AUTONOMOUS MODE"
+echo "Starting LiDAR"
+xterm -e "python ~/Formula1Epoch/datacollection/data/lidar/infer_lidar.py" &
+echo "done."
+cd ~/racecar-ws
+echo "Starting racecar"
+xterm -e "source devel/setup.bash && roslaunch racecar teleop.launch" &
+echo "done." &
+echo "Now driving with F1 Epoch v1.0"

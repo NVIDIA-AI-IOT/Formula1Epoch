@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/racecar-ws/install/setup.sh
