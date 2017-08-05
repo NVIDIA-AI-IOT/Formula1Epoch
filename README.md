@@ -1,4 +1,4 @@
-  [![title.png](https://s22.postimg.org/w9sb0vysh/title.png)](https://postimg.org/image/bpnh2ej19/)
+[![logo.png](https://s2.postimg.org/fwiu26nmh/Copy_of_electron.png)](https://postimg.org/image/sb5m2if4l/)
 
 Repository for the Formula 1 Epoch, or F1Epoch, Team.
 
